@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # 🔐 मोंगोडीबी कनेक्शन (इसे एक ही लाइन में रखें)
-MONGO_URI = "mongodb+srv://erparveen01027_db_user:MNwwnUMVC5UnXZrk@cluster0.pluvfcd.mongodb.net/?appName=Cluster0"
+MONGO_URI = os.getenv("MONGO_URI")
 
 client = MongoClient(MONGO_URI)
 db = client['central_wallet_db']
