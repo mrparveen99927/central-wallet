@@ -6,105 +6,144 @@
     <title>PhonePe Style Wallet - Auth</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
-        body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        
-        /* PhonePe Purple Container */
-        .phonepe-container { background: #ffffff; width: 100%; max-width: 420px; min-height: 100vh; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        
-        /* Top Banner Style */
-        .top-banner { background: #5f259f; padding: 40px 24px 30px 24px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; color: #ffffff; }
-        .app-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .app-subtitle { font-size: 14px; color: #e2d5f3; font-weight: 400; }
-        
-        /* Form Box */
+        body { background: #000000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .phonepe-container { background: #121212; width: 100%; max-width: 420px; min-height: 100vh; display: flex; flex-direction: column; border: 1px solid #1c1c1c; }
+        .top-banner { background: #1a0933; padding: 40px 24px 30px 24px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; color: #ffffff; border-bottom: 1px solid #2d1254; }
+        .app-title { font-size: 26px; font-weight: 700; color: #9d4edd; }
+        .app-subtitle { font-size: 13px; color: #aaaaaa; margin-top: 4px; }
         .form-box { padding: 30px 24px; flex: 1; display: flex; flex-direction: column; }
-        .tab-nav { display: flex; margin-bottom: 30px; background: #eee7f6; border-radius: 8px; padding: 4px; }
-        .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 15px; font-weight: 600; color: #5f259f; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .tab-nav { display: flex; margin-bottom: 30px; background: #1e1e1e; border-radius: 8px; padding: 4px; border: 1px solid #2d1254; }
+        .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 14px; font-weight: 600; color: #888; cursor: pointer; border-radius: 6px; }
         .tab-btn.active { background: #5f259f; color: #ffffff; }
-        
-        .input-wrapper { position: relative; margin-bottom: 22px; }
-        .input-wrapper label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
-        .input-wrapper input { width: 100%; padding: 14px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; color: #333; transition: 0.2s; outline: none; background: #fafafa; }
-        .input-wrapper input:focus { border-color: #5f259f; background: #ffffff; box-shadow: 0 0 0 3px rgba(95, 37, 159, 0.15); }
-        
-        /* PhonePe Secure Button */
-        .submit-btn { width: 100%; padding: 16px; background: #5f259f; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(95, 37, 159, 0.2); margin-top: auto; text-transform: uppercase; letter-spacing: 0.5px; }
-        .submit-btn:hover { background: #4a1d7c; }
-        
+        .input-wrapper { margin-bottom: 22px; }
+        .input-wrapper label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
+        .input-wrapper input { width: 100%; padding: 14px 12px; border: 1px solid #334155; border-radius: 8px; font-size: 16px; color: #333; outline: none; background: #0a0a0a; color: white; }
+        .input-wrapper input:focus { border-color: #9d4edd; }
+        .submit-btn { width: 100%; padding: 16px; background: #5f259f; color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: auto; }
         .hidden { display: none; }
-        .security-footer { text-align: center; font-size: 12px; color: #888; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        .security-footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="phonepe-container">
-    <!-- Top Header Purple Section -->
     <div class="top-banner">
         <div class="app-title">🔮 Central Wallet</div>
-        <div class="app-subtitle">Secure Digital Token & Gaming Platform</div>
+        <div class="app-subtitle">Secure Digital Token Platform</div>
     </div>
     
-    <!-- Auth Content Area -->
     <div class="form-box">
         <div class="tab-nav">
-            <button class="tab-btn active" id="login-tab" onclick="switchTab('login')">PROCEED TO LOGIN</button>
+            <button class="tab-btn active" id="login-tab" onclick="switchTab('login')">LOGIN</button>
             <button class="tab-btn" id="register-tab" onclick="switchTab('register')">REGISTER</button>
         </div>
 
         <!-- Login Section -->
         <div id="login-section">
             <div class="input-wrapper">
-                <label>Enter Mobile Number</label>
-                <input type="tel" placeholder="10-digit number" maxlength="10">
+                <label>Mobile Number</label>
+                <input type="tel" id="login-mobile" placeholder="10-digit number" maxlength="10">
             </div>
             <div class="input-wrapper">
-                <label>Enter 4-Digit MPIN / Password</label>
-                <input type="password" placeholder="••••" maxlength="6">
+                <label>4-Digit Login MPIN</label>
+                <input type="password" id="login-mpin" placeholder="••••" maxlength="4">
             </div>
-            <button class="submit-btn">PROCEED SECURELY</button>
+            <button class="submit-btn" onclick="executeLogin()">PROCEED SECURELY</button>
         </div>
 
         <!-- Register Section -->
         <div id="register-section" class="hidden">
             <div class="input-wrapper">
                 <label>Full Name</label>
-                <input type="text" placeholder="As per bank records">
+                <input type="text" id="reg-name" placeholder="Enter your name">
             </div>
             <div class="input-wrapper">
                 <label>Mobile Number</label>
-                <input type="tel" placeholder="For account identification" maxlength="10">
+                <input type="tel" id="reg-mobile" placeholder="10-digit number" maxlength="10">
             </div>
             <div class="input-wrapper">
                 <label>Set 4-Digit Login MPIN</label>
-                <input type="password" placeholder="••••" maxlength="4">
+                <input type="password" id="reg-mpin" placeholder="••••" maxlength="4">
             </div>
-            <button class="submit-btn" style="background: #10b981; box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);">CREATE WALLET</button>
+            <button class="submit-btn" style="background: #10b981;" onclick="executeRegister()">CREATE WALLET</button>
         </div>
 
-        <!-- Trust Security Footer -->
-        <div class="security-footer">
-            🔒 100% Device Bound & Secure Encryption
-        </div>
+        <div class="security-footer">🔒 100% Device Bound Encryption</div>
     </div>
 </div>
 
 <script>
+    // 🔗 आपका असली लाइव बैकएंड सर्वर लिंक
+    const SERVER_URL = "https://onrender.com";
+
     function switchTab(mode) {
         const loginSec = document.getElementById('login-section');
         const regSec = document.getElementById('register-section');
         const loginTab = document.getElementById('login-tab');
         const regTab = document.getElementById('register-tab');
-        
         if (mode === 'login') {
-            loginSec.classList.remove('hidden');
-            regSec.classList.add('hidden');
-            loginTab.classList.add('active');
-            regTab.classList.remove('active');
+            loginSec.classList.remove('hidden'); regSec.classList.add('hidden');
+            loginTab.classList.add('active'); regTab.classList.remove('active');
         } else {
-            loginSec.classList.add('hidden');
-            regSec.classList.remove('hidden');
-            loginTab.classList.remove('active');
-            regTab.classList.add('active');
+            loginSec.classList.add('hidden'); regSec.classList.remove('hidden');
+            loginTab.classList.remove('active'); regTab.classList.add('active');
+        }
+    }
+
+    // 👤 असली रजिस्ट्रेशन फंक्शन (डेटाबेस से कनेक्टेड)
+    async function executeRegister() {
+        const name = document.getElementById('reg-name').value;
+        const mobile = document.getElementById('reg-mobile').value;
+        const mpin = document.getElementById('reg-mpin').value;
+
+        if(!name || mobile.length !== 10 || mpin.length !== 4) {
+            alert("❌ Please fill all fields correctly!"); return;
+        }
+
+        try {
+            const response = await fetch(`${SERVER_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, mobile, mpin })
+            });
+            const result = await response.json();
+            alert(result.message);
+            if(result.status === 'success') switchTab('login');
+        } catch (err) {
+            alert("❌ Server Connection Error!");
+        }
+    }
+
+    // 🔑 असली लॉगिन फंक्शन (डेटाबेस से कनेक्टेड)
+    async function executeLogin() {
+        const mobile = document.getElementById('login-mobile').value;
+        const mpin = document.getElementById('login-mpin').value;
+
+        if(mobile.length !== 10 || mpin.length !== 4) {
+            alert("❌ Please enter valid 10-digit number and 4-digit MPIN!"); return;
+        }
+
+        try {
+            const response = await fetch(`${SERVER_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mobile, mpin })
+            });
+            const result = await response.json();
+            if(result.status === 'success') {
+                // लॉगिन सफल होने पर यूजर डेटा को लोकल मेमोरी में सुरक्षित करना
+                localStorage.setItem('user_name', result.user.name);
+                localStorage.setItem('user_phone', result.user.mobile);
+                localStorage.setItem('user_balance', result.user.balance);
+                localStorage.setItem('user_id', "user_" + mobile.substring(6));
+                
+                alert("🎉 Login Successful! Redirecting...");
+                window.location.href = "dashboard.html"; // होम पेज पर भेजना
+            } else {
+                alert(result.message);
+            }
+        } catch (err) {
+            alert("❌ Server Connection Error!");
         }
     }
 </script>
