@@ -136,7 +136,7 @@ def add_tokens():
 
 # 🛠️ 5. CPANEL / ADMIN LOGIC
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "SuperSecretPassword123"
+ADMIN_PASSWORD = "Parveen123"
 
 if not settings_collection.find_one({"type": "global_config"}):
     settings_collection.insert_one({"type": "global_config", "transfer_fee_percent": 3.0, "ads_enabled": True})
