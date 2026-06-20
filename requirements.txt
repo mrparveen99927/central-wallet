@@ -4,3 +4,4 @@ pymongo[srv]
 gunicorn
 
 dnspython
+certifi
