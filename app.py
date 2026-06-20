@@ -191,7 +191,5 @@ def control_user():
         return jsonify({"success": True, "message": "Device unlocked!"})
     return jsonify({"success": False, "message": "Invalid action"}), 400
 
-# 🚀 पायथन स्टार्ट इंजन (हमेशा फ़ाइल के सबसे अंत में)
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
