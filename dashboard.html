@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe Official Dark Layout</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+        body { background: #000000; color: #ffffff; padding-bottom: 110px; } /* स्पेस बढ़ाया ताकि 5 बटन्स एकदम साफ़ दिखें */
+        
+        /* Top PhonePe Purple Bar */
+        .pe-header-bar { background: #1c0d35; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1454; }
+        .user-avatar { width: 34px; height: 34px; background: #5f259f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; border: 1px solid #9d4edd; font-size: 14px; text-decoration: none; color: white; }
+        .header-brand { font-size: 16px; font-weight: 700; color: #ffffff; }
+        .help-mark { font-size: 18px; color: #ffffff; background: none; border: none; cursor: pointer; }
+
+        /* 📺 TOP BIG AD BANNER */
+        .top-ad-placement { background: linear-gradient(135deg, #240b49, #4a1294); margin: 12px; padding: 25px 16px; border-radius: 12px; border: 1px solid #3c1375; text-align: center; min-height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .ad-main-txt { font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .ad-sub-txt { font-size: 12px; color: #c09fed; font-weight: 500; }
+
+        /* General Section Block Layout */
+        .app-block-section { background: #121212; margin: 12px; padding: 16px; border-radius: 12px; border: 1px solid #1c1c1c; }
+        .block-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .block-title-text { font-size: 14px; font-weight: 700; color: #ffffff; letter-spacing: 0.2px; }
+        .orange-badge { background: rgba(249, 115, 22, 0.12); color: #f97316; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(249, 115, 22, 0.25); }
+
+        /* Circle Icons Grid */
+        .circle-icons-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
+        .circle-nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-decoration: none; position: relative; }
+        .icon-round-shape { width: 56px; height: 56px; background: #1f0f33; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; margin-bottom: 10px; border: 1px solid #351a54; }
+        .circle-item-label { font-size: 11px; color: #aaaaaa; font-weight: 500; line-height: 14px; }
+        .badge-mini-2percent { position: absolute; top: -6px; right: 4px; background: #f97316; color: white; font-size: 8px; font-weight: bold; padding: 2px 5px; border-radius: 4px; z-index: 5; text-transform: uppercase; }
+
+        /* Square Icons Grid */
+        .square-icons-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
+        .square-nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-decoration: none; }
+        .icon-square-shape { width: 50px; height: 50px; background: #181818; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; margin-bottom: 8px; border: 1px solid #262626; }
+
+        /* 📱 सुधरा हुआ 5 ऑप्शंस वाला PhonePe स्टाइल बॉटम बार */
+        .bottom-phonepe-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0d0d0d; height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1c1c1c; z-index: 1000; padding-bottom: 5px; }
+        .bar-link-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #777777; font-size: 11px; font-weight: 600; cursor: pointer; flex: 1; height: 100%; width: 20%; }
+        .bar-raw-icon { font-size: 20px; margin-bottom: 4px; display: block; text-align: center; }
+        .bar-link-item span { display: block; text-align: center; }
+        .bar-link-item.active { color: #ffffff; }
+        
+        /* 🟣 तैरता हुआ गोल जामुनी कलर का QR Scan बटन */
+        .bar-link-item.scan-center-floating { position: relative; margin-top: -34px; flex: none; width: 76px; height: 76px; z-index: 1001; }
+        .scan-purple-circle { width: 60px; height: 60px; background: #5f259f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; color: white; border: 4px solid #000000; box-shadow: 0 -4px 14px rgba(95, 37, 159, 0.45); margin: 0 auto; }
+        .scan-title-lbl { font-size: 11px; color: #777777; margin-top: 3px; font-weight: 600; display: block; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar Row -->
+    <div class="pe-header-bar">
+        <!-- अब यहाँ क्लिक करने पर आपका असली नया प्रोफाइल पेज खुलेगा -->
+        <a href="profile.html" class="user-avatar">👤</a>
+        <div class="header-brand">🔮 Central Wallet</div>
+        <button class="help-mark" onclick="alert('Support System Online')">❓</button>
+    </div>
+
+    <!-- 📺 TOP BIG AD BANNER -->
+    <div class="top-ad-placement">
+        <span style="background:#10b981; color:white; font-size:9px; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">Sponsored Ads</span>
+        <div class="ad-main-txt">FREE ADVERTISING SPACE</div>
+        <div class="ad-sub-txt">Earn automatic tokens by checking featured platforms daily.</div>
+    </div>
+
+    <!-- Section 1: Money Transfers -->
+    <div class="app-block-section">
+        <div class="block-header-row">
+            <span class="block-title-text">Money Transfers</span>
+            <span class="orange-badge" onclick="triggerInvite()">Refer & Earn → ₹200</span>
+        </div>
+        <div class="circle-icons-grid">
+            <div class="circle-nav-item" onclick="alert('Opening: Wallet-to-Wallet Coin Transfer')">
+                <div class="icon-round-shape">📱</div>
+                <span class="circle-item-label">To Mobile<br>Number</span>
+            </div>
+            <div class="circle-nav-item" onclick="alert('Launching Live Room: 100 Persons Game Arena')">
+                <div class="icon-round-shape" style="background:linear-gradient(135deg, #5f259f, #3c1375); border-color:#5f259f;">🎯</div>
+                <span class="circle-item-label" style="color:#d8b4fe; font-weight:600;">Play Game<br>(Class A-D)</span>
+            </div>
+            <div class="circle-nav-item" onclick="alert('Opening: Deposit Money Area (QR & UTR)')">
+                <span class="badge-mini-2percent">2% back</span>
+                <div class="icon-round-shape">📥</div>
+                <span class="circle-item-label">Add Coins<br>(QR / UTR)</span>
+            </div>
+            <div class="circle-nav-item" onclick="alert('Wallet Tokens Available Balance: 🪙500.00')">
+                <div class="icon-round-shape">💸</div>
+                <span class="circle-item-label">Check<br>Balance</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Profit, Withdrawal & Tasks -->
+    <div class="app-block-section">
+        <div class="block-header-row">
+            <span class="block-title-text">Profit & Wallet Settings</span>
+        </div>
+        <div class="square-icons-grid">
+            <div class="square-nav-item" onclick="alert('Opening Hidden View: Cash-out Payout')">
+                <div class="icon-square-shape" style="background:#2d0b0b; border-color:#4a1212; color:#fca5a5;">💰</div>
+                <span class="circle-item-label">Request<br>Withdrawal</span>
+            </div>
+            <div class="square-nav-item" onclick="triggerInvite()">
+                <div class="icon-square-shape" style="background:#0b2d1a; border-color:#124a29; color:#a7f3d0;">🤝</div>
+                <span class="circle-item-label">Invite<br>Friends</span>
+            </div>
+            <div class="square-nav-item" style="opacity:0.3;">
+                <div class="icon-square-shape">💡</div>
+                <span class="circle-item-label">Electricity<br>Bill</span>
+            </div>
+            <div class="square-nav-item" style="opacity:0.3;">
+                <div class="icon-square-shape">🛍️</div>
+                <span class="circle-item-label">Offers<br>Zone</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 फिक्स 5 ऑप्शंस वाला बॉटम बार जो अब बिल्कुल साफ दिखेगा -->
+    <div class="bottom-phonepe-bar">
+        <button class="bar-link-item active" onclick="changeActiveNav(this)">
+            <span class="bar-raw-icon">🏠</span>
+            <span>Home</span>
+        </button>
+        <button class="bar-link-item" onclick="changeActiveNav(this)">
+            <span class="bar-raw-icon">🔍</span>
+            <span>Search</span>
+        </button>
+        
+        <!-- 🟣 Central Floating Scanner Button -->
+        <button class="bar-link-item scan-center-floating" onclick="alert('Scanning Friend\'s QR Code...')">
+            <div class="scan-purple-circle">🔲</div>
+            <span class="scan-title-lbl">Scan</span>
+        </button>
+        
+        <button class="bar-link-item" onclick="changeActiveNav(this)">
+            <span class="bar-raw-icon">🔔</span>
+            <span>Alerts</span>
+        </button>
+        <button class="bar-link-item" onclick="changeActiveNav(this)">
+            <span class="bar-raw-icon">📜</span>
+            <span>History</span>
+        </button>
+    </div>
+
+<script>
+    function triggerInvite() {
+        alert("🔗 Referral System Active!");
+    }
+    
+    function changeActiveNav(element) {
+        const items = document.querySelectorAll('.bar-link-item');

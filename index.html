@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe Style Wallet - Auth</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+        body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        /* PhonePe Purple Container */
+        .phonepe-container { background: #ffffff; width: 100%; max-width: 420px; min-height: 100vh; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        /* Top Banner Style */
+        .top-banner { background: #5f259f; padding: 40px 24px 30px 24px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; color: #ffffff; }
+        .app-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .app-subtitle { font-size: 14px; color: #e2d5f3; font-weight: 400; }
+        
+        /* Form Box */
+        .form-box { padding: 30px 24px; flex: 1; display: flex; flex-direction: column; }
+        .tab-nav { display: flex; margin-bottom: 30px; background: #eee7f6; border-radius: 8px; padding: 4px; }
+        .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 15px; font-weight: 600; color: #5f259f; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .tab-btn.active { background: #5f259f; color: #ffffff; }
+        
+        .input-wrapper { position: relative; margin-bottom: 22px; }
+        .input-wrapper label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+        .input-wrapper input { width: 100%; padding: 14px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; color: #333; transition: 0.2s; outline: none; background: #fafafa; }
+        .input-wrapper input:focus { border-color: #5f259f; background: #ffffff; box-shadow: 0 0 0 3px rgba(95, 37, 159, 0.15); }
+        
+        /* PhonePe Secure Button */
+        .submit-btn { width: 100%; padding: 16px; background: #5f259f; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(95, 37, 159, 0.2); margin-top: auto; text-transform: uppercase; letter-spacing: 0.5px; }
+        .submit-btn:hover { background: #4a1d7c; }
+        
+        .hidden { display: none; }
+        .security-footer { text-align: center; font-size: 12px; color: #888; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="phonepe-container">
+    <!-- Top Header Purple Section -->
+    <div class="top-banner">
+        <div class="app-title">🔮 Central Wallet</div>
+        <div class="app-subtitle">Secure Digital Token & Gaming Platform</div>
+    </div>
+    
+    <!-- Auth Content Area -->
+    <div class="form-box">
+        <div class="tab-nav">
+            <button class="tab-btn active" id="login-tab" onclick="switchTab('login')">PROCEED TO LOGIN</button>
+            <button class="tab-btn" id="register-tab" onclick="switchTab('register')">REGISTER</button>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login-section">
+            <div class="input-wrapper">
+                <label>Enter Mobile Number</label>
+                <input type="tel" placeholder="10-digit number" maxlength="10">
+            </div>
+            <div class="input-wrapper">
+                <label>Enter 4-Digit MPIN / Password</label>
+                <input type="password" placeholder="••••" maxlength="6">
+            </div>
+            <button class="submit-btn">PROCEED SECURELY</button>
+        </div>
+
+        <!-- Register Section -->
+        <div id="register-section" class="hidden">
+            <div class="input-wrapper">
+                <label>Full Name</label>
+                <input type="text" placeholder="As per bank records">
+            </div>
+            <div class="input-wrapper">
+                <label>Mobile Number</label>
+                <input type="tel" placeholder="For account identification" maxlength="10">
+            </div>
+            <div class="input-wrapper">
+                <label>Set 4-Digit Login MPIN</label>
+                <input type="password" placeholder="••••" maxlength="4">
+            </div>
+            <button class="submit-btn" style="background: #10b981; box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);">CREATE WALLET</button>
+        </div>
+
+        <!-- Trust Security Footer -->
+        <div class="security-footer">
+            🔒 100% Device Bound & Secure Encryption
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(mode) {
+        const loginSec = document.getElementById('login-section');
+        const regSec = document.getElementById('register-section');
+        const loginTab = document.getElementById('login-tab');
+        const regTab = document.getElementById('register-tab');
+        
+        if (mode === 'login') {
+            loginSec.classList.remove('hidden');
+            regSec.classList.add('hidden');
+            loginTab.classList.add('active');
+            regTab.classList.remove('active');
+        } else {
+            loginSec.classList.add('hidden');
+            regSec.classList.remove('hidden');
+            loginTab.classList.remove('active');
+            regTab.classList.add('active');
+        }
+    }
+</script>
+</body>
+</html>
