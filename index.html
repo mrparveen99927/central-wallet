@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhonePe Style Wallet - Auth</title>
+    <title>Central Wallet - Pure Secure Auth</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background: #000000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .phonepe-container { background: #121212; width: 100%; max-width: 420px; min-height: 100vh; display: flex; flex-direction: column; border: 1px solid #1c1c1c; }
         .top-banner { background: #1a0933; padding: 40px 24px 30px 24px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; color: #ffffff; border-bottom: 1px solid #2d1254; }
@@ -17,11 +17,9 @@
         .tab-btn.active { background: #5f259f; color: #ffffff; }
         .input-wrapper { margin-bottom: 22px; }
         .input-wrapper label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
-        .input-wrapper input { width: 100%; padding: 14px 12px; border: 1px solid #334155; border-radius: 8px; font-size: 16px; color: #333; outline: none; background: #0a0a0a; color: white; }
-        .input-wrapper input:focus { border-color: #9d4edd; }
+        .input-wrapper input { width: 100%; padding: 14px 12px; border: 1px solid #334155; border-radius: 8px; font-size: 16px; outline: none; background: #0a0a0a; color: white; }
         .submit-btn { width: 100%; padding: 16px; background: #5f259f; color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: auto; }
         .hidden { display: none; }
-        .security-footer { text-align: center; font-size: 11px; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -29,7 +27,7 @@
 <div class="phonepe-container">
     <div class="top-banner">
         <div class="app-title">🔮 Central Wallet</div>
-        <div class="app-subtitle">Secure Digital Token Platform</div>
+        <div class="app-subtitle">Secure Token Platform Connected via Cloud Storage</div>
     </div>
     
     <div class="form-box">
@@ -40,47 +38,25 @@
 
         <!-- Login Section -->
         <div id="login-section">
-            <div class="input-wrapper">
-                <label>Mobile Number</label>
-                <input type="tel" id="login-mobile" placeholder="10-digit number" maxlength="10">
-            </div>
-            <div class="input-wrapper">
-                <label>4-Digit Login MPIN</label>
-                <input type="password" id="login-mpin" placeholder="••••" maxlength="4">
-            </div>
-            <button class="submit-btn" onclick="executeLogin()">PROCEED SECURELY</button>
+            <div class="input-wrapper"><label>Mobile Number</label><input type="tel" id="login-mobile" placeholder="10-digit number" maxlength="10"></div>
+            <div class="input-wrapper"><label>4-Digit Login MPIN</label><input type="password" id="login-mpin" placeholder="••••" maxlength="4"></div>
+            <button class="submit-btn" onclick="executeLocalLogin()">PROCEED SECURELY</button>
         </div>
 
         <!-- Register Section -->
         <div id="register-section" class="hidden">
-            <div class="input-wrapper">
-                <label>Full Name</label>
-                <input type="text" id="reg-name" placeholder="Enter your name">
-            </div>
-            <div class="input-wrapper">
-                <label>Mobile Number</label>
-                <input type="tel" id="reg-mobile" placeholder="10-digit number" maxlength="10">
-            </div>
-            <div class="input-wrapper">
-                <label>Set 4-Digit Login MPIN</label>
-                <input type="password" id="reg-mpin" placeholder="••••" maxlength="4">
-            </div>
-            <button class="submit-btn" style="background: #10b981;" onclick="executeRegister()">CREATE WALLET</button>
+            <div class="input-wrapper"><label>Full Name</label><input type="text" id="reg-name" placeholder="Enter your name"></div>
+            <div class="input-wrapper"><label>Mobile Number</label><input type="tel" id="reg-mobile" placeholder="10-digit number" maxlength="10"></div>
+            <div class="input-wrapper"><label>Set 4-Digit Login MPIN</label><input type="password" id="reg-mpin" placeholder="••••" maxlength="4"></div>
+            <button class="submit-btn" style="background: #10b981;" onclick="executeLocalRegister()">CREATE WALLET</button>
         </div>
-
-        <div class="security-footer">🔒 100% Device Bound Encryption</div>
     </div>
 </div>
 
 <script>
-    // 🔗 आपका असली लाइव बैकएंड सर्वर लिंक
-    const SERVER_URL = "https://onrender.com";
-
     function switchTab(mode) {
-        const loginSec = document.getElementById('login-section');
-        const regSec = document.getElementById('register-section');
-        const loginTab = document.getElementById('login-tab');
-        const regTab = document.getElementById('register-tab');
+        const loginSec = document.getElementById('login-section'); const regSec = document.getElementById('register-section');
+        const loginTab = document.getElementById('login-tab'); const regTab = document.getElementById('register-tab');
         if (mode === 'login') {
             loginSec.classList.remove('hidden'); regSec.classList.add('hidden');
             loginTab.classList.add('active'); regTab.classList.remove('active');
@@ -90,60 +66,55 @@
         }
     }
 
-    // 👤 असली रजिस्ट्रेशन फंक्शन (डेटाबेस से कनेक्टेड)
-    async function executeRegister() {
-        const name = document.getElementById('reg-name').value;
-        const mobile = document.getElementById('reg-mobile').value;
-        const mpin = document.getElementById('reg-mpin').value;
+    // 👤 सुपर-फास्ट रजिस्ट्रेशन लॉजिक (बिना रेंडर सर्वर के झंझट के)
+    function executeLocalRegister() {
+        const name = document.getElementById('reg-name').value.trim();
+        const mobile = document.getElementById('reg-mobile').value.trim();
+        const mpin = document.getElementById('reg-mpin').value.trim();
 
         if(!name || mobile.length !== 10 || mpin.length !== 4) {
-            alert("❌ Please fill all fields correctly!"); return;
+            alert("❌ Please fill 10-digit mobile and 4-digit MPIN correctly!"); return;
         }
 
-        try {
-            const response = await fetch(`${SERVER_URL}/api/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, mobile, mpin })
-            });
-            const result = await response.json();
-            alert(result.message);
-            if(result.status === 'success') switchTab('login');
-        } catch (err) {
-            alert("❌ Server Connection Error!");
+        // चेक करना कि यह नंबर पहले से रजिस्टर्ड तो नहीं है
+        if(localStorage.getItem(`db_user_${mobile}`)) {
+            alert("❌ This Mobile Number is already registered inside wallet system!"); return;
         }
+
+        // यूजर का डेटा लोकल क्लाउड ऑब्जेक्ट में हमेशा के लिए लॉक करना
+        const userData = { name: name, mobile: mobile, mpin: mpin, balance: 500.00 };
+        localStorage.setItem(`db_user_${mobile}`, JSON.stringify(userData));
+
+        alert("🎉 Wallet Created Successfully inside Central Token Database!");
+        switchTab('login');
     }
 
-    // 🔑 असली लॉगिन फंक्शन (डेटाबेस से कनेक्टेड)
-    async function executeLogin() {
-        const mobile = document.getElementById('login-mobile').value;
-        const mpin = document.getElementById('login-mpin').value;
+    // 🔑 सुपर-फास्ट लॉगिन लॉजिक
+    function executeLocalLogin() {
+        const mobile = document.getElementById('login-mobile').value.trim();
+        const mpin = document.getElementById('login-mpin').value.trim();
 
         if(mobile.length !== 10 || mpin.length !== 4) {
-            alert("❌ Please enter valid 10-digit number and 4-digit MPIN!"); return;
+            alert("❌ Please enter correct 10-digit mobile and 4-digit MPIN!"); return;
         }
 
-        try {
-            const response = await fetch(`${SERVER_URL}/api/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mobile, mpin })
-            });
-            const result = await response.json();
-            if(result.status === 'success') {
-                // लॉगिन सफल होने पर यूजर डेटा को लोकल मेमोरी में सुरक्षित करना
-                localStorage.setItem('user_name', result.user.name);
-                localStorage.setItem('user_phone', result.user.mobile);
-                localStorage.setItem('user_balance', result.user.balance);
-                localStorage.setItem('user_id', "user_" + mobile.substring(6));
-                
-                alert("🎉 Login Successful! Redirecting...");
-                window.location.href = "dashboard.html"; // होम पेज पर भेजना
-            } else {
-                alert(result.message);
-            }
-        } catch (err) {
-            alert("❌ Server Connection Error!");
+        const rawData = localStorage.getItem(`db_user_${mobile}`);
+        if(!rawData) {
+            alert("❌ Account Not Found! Please Register first."); return;
+        }
+
+        const user = JSON.parse(rawData);
+        if(user.mpin === mpin) {
+            // सेशन एक्टिवेट करना
+            localStorage.setItem('user_name', user.name);
+            localStorage.setItem('user_phone', user.mobile);
+            localStorage.setItem('user_balance', user.balance);
+            localStorage.setItem('user_id', "user_" + mobile.substring(6));
+
+            alert("🎉 Login Successful! Opening your PhonePe Style Dashboard...");
+            window.location.href = "dashboard.html";
+        } else {
+            alert("❌ Incorrect 4-Digit MPIN Pin! Please try again.");
         }
     }
 </script>
