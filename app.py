@@ -118,3 +118,82 @@ def transfer_coins():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
+# ----------------- 5. POWERFUL CPANEL LOGIC -----------------
+
+# एडमिन लॉगिन सुरक्षा (आप अपना पासवर्ड यहाँ बदल सकते हैं)
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "SuperSecretPassword123" # इसे बदल लें
+
+# एडमिन सेटिंग्स के लिए मोंगोडीबी में एक नया कलेक्शन
+settings_collection = db['gateway_settings']
+
+# डिफ़ॉल्ट सेटिंग्स सेट करना (यदि डेटाबेस में न हो)
+if not settings_collection.find_one({"type": "global_config"}):
+    settings_collection.insert_one({
+        "type": "global_config",
+        "transfer_fee_percent": 3.0,
+        "ads_enabled": True
+    })
+
+# A. एडमिन लॉगिन API
+@app.route('/api/admin/login', methods=['POST'])
+def admin_login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+        return jsonify({"success": True, "token": "SECURE_ADMIN_SESSION_TOKEN"})
+    return jsonify({"success": False, "message": "गलत एडमिन क्रेडेंशियल्स!"}), 401
+
+# B. लाइव डैशबोर्ड स्टेट्स (कुल डिपॉजिट, विड्रॉल और फीस कमाई)
+@app.route('/api/admin/dashboard-stats', methods=['GET'])
+def get_stats():
+    total_users = users_collection.count_documents({})
+    pending_utr = transactions_collection.count_documents({"status": "Pending"})
+    
+    # ग्लोबल कॉन्फ़िगरेशन निकालें
+    config = settings_collection.find_one({"type": "global_config"})
+    
+    return jsonify({
+        "success": True,
+        "totalUsers": total_users,
+        "pendingUtrCount": pending_utr,
+        "currentFee": config.get('transfer_fee_percent', 3.0),
+        "adsStatus": config.get('ads_enabled', True)
+    })
+
+# C. गेटवे रिमोट कंट्रोल्स (फीस बदलना और विज्ञापन ऑन/ऑफ करना)
+@app.route('/api/admin/update-settings', methods=['POST'])
+def update_settings():
+    data = request.json
+    fee = data.get('fee')
+    ads = data.get('ads') # True या False
+    
+    update_data = {}
+    if fee is not None: update_data["transfer_fee_percent"] = float(fee)
+    if ads is not None: update_data["ads_enabled"] = bool(ads)
+    
+    settings_collection.update_one({"type": "global_config"}, {"$set": update_data})
+    return jsonify({"success": True, "message": "गेटवे सेटिंग्स सफलतापूर्वक अपडेट हो गई हैं!"})
+
+# D. यूजर मैनेजमेंट (मैन्युअल गिफ्ट कॉइन्स देना या डिवाइस अनलॉक करना)
+@app.route('/api/admin/control-user', methods=['POST'])
+def control_user():
+    data = request.json
+    mobile = data.get('mobileNumber')
+    action = data.get('action') # 'gift' या 'unlock_device'
+    amount = data.get('amount', 0)
+    
+    user = users_collection.find_one({"mobileNumber": mobile})
+    if not user:
+        return jsonify({"success": False, "message": "यूज़र नहीं मिला!"}), 404
+        
+    if action == 'gift':
+        users_collection.update_one({"mobileNumber": mobile}, {"$inc": {"balance": float(amount)}})
+        return jsonify({"success": True, "message": f"यूज़र को {amount} गिफ्ट कॉइन्स दे दिए गए हैं!"})
+        
+    elif action == 'unlock_device':
+        users_collection.update_one({"mobileNumber": mobile}, {"$set": {"device_id": None}})
+        return jsonify({"success": True, "message": "यूज़र का डिवाइस लॉक हटा दिया गया है!"})

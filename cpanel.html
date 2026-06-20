@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N&N Network - Secure CPanel</title>
+    <style>
+        body { background-color: #0b0b16; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: #151530; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #311b92; }
+        h2 { color: #b388ff; border-bottom: 20px; margin-top: 0; }
+        input, select { background: #222244; color: white; border: 1px solid #4a148c; padding: 10px; border-radius: 6px; width: 95%; margin-bottom: 15px; }
+        button { background: #6a1b9a; color: white; font-weight: bold; border: none; padding: 11px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #8e24aa; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hidden { display: none; }
+        .badge { background: #4a148c; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- खंड 1: एडमिन लॉगिन लॉक -->
+    <div id="login-section" class="card">
+        <h2>🔐 N&N Gateway - Admin Secure Login</h2>
+        <input type="text" id="admin-user" placeholder="एडमिन यूजरनाम">
+        <input type="password" id="admin-pass" placeholder="गुप्त पासवर्ड">
+        <button onclick="loginAdmin()">प्रवेश करें (Verify Session)</button>
+    </div>
+
+    <!-- खंड 2: मुख्य CPanel (लॉगिन के बाद ही दिखेगा) -->
+    <div id="main-cpanel" class="hidden">
+        
+        <h2>📊 लाइव गेटवे डैशबोर्ड (Real-time Stats)</h2>
+        <div class="card grid">
+            <div>👥 कुल रजिस्टर्ड यूज़र्स: <span id="stat-users" class="badge">0</span></div>
+            <div>⏳ पेंडिंग UTR डिपॉजिट: <span id="stat-utr" class="badge">0</span></div>
+        </div>
+
+        <h2>⚙️ गेटवे रिमोट कंट्रोल्स (Gateway Engine Settings)</h2>
+        <div class="card grid">
+            <div>
+                <label>🏦 ट्रांसफर विड्रॉल फीस (%):</label>
+                <input type="number" id="fee-input" min="3" max="5" step="0.5">
+                <button onclick="saveGatewaySettings()">फीस अपडेट करें</button>
+            </div>
+            <div>
+                <label>📢 गूगल / यूनिटी विज्ञापन:</label>
+                <select id="ads-toggle">
+                    <option value="true">ON (विज्ञापन चालू रखें)</option>
+                    <option value="false">OFF (विज्ञापन बंद करें)</option>
+                </select>
+                <button onclick="saveGatewaySettings()">Ads स्टेटस बदलें</button>
+            </div>
+        </div>
+
+        <h2>👤 यूज़र और डिवाइस लॉक मैनेजमेंट (Anti-Fraud)</h2>
+        <div class="card">
+            <input type="text" id="target-mobile" placeholder="यूज़र का 10-डिजिट मोबाइल नंबर">
+            <div class="grid">
+                <div>
+                    <input type="number" id="gift-amount" placeholder="गिफ्ट कॉइन्स अमाउंट (₹)">
+                    <button onclick="manageUser('gift')">🎁 कॉइन्स क्रेडिट करें</button>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button style="background:#c62828" onclick="manageUser('unlock_device')">🔓 डिवाइस लॉक खोलें (Reset UUID)</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://onrender.com";
+
+    // A. एडमिन लॉगिन लॉजिक
+    async function loginAdmin() {
+        const u = document.getElementById("admin-user").value;
+        const p = document.getElementById("admin-pass").value;
+
+        try {
+            const res = await fetch(`${API_URL}/api/admin/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await res.json();
+            if(res.ok) {
+                document.getElementById("login-section").classList.add("hidden");
+                document.getElementById("main-cpanel").classList.remove("hidden");
+                loadDashboardStats();
+            }
+        } catch(e) { alert("गलत क्रेडेंशियल्स! दोबारा प्रयास करें।"); }
+    }
+
+    // B. डैशबोर्ड डेटा लोड करना
+    async function loadDashboardStats() {
+        const res = await fetch(`${API_URL}/api/admin/dashboard-stats`);
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById("stat-users").innerText = data.totalUsers;
+            document.getElementById("stat-utr").innerText = data.pendingUtrCount;
+            document.getElementById("fee-input").value = data.currentFee;
+            document.getElementById("ads-toggle").value = data.adsStatus.toString();
+        }
+    }
+
+    // C. सेटिंग्स अपडेट करना (फीस और विज्ञापन)
+    async function saveGatewaySettings() {
+        const fee = document.getElementById("fee-input").value;
+        const ads = document.getElementById("ads-toggle").value === "true";
+
+        const res = await fetch(`${API_URL}/api/admin/update-settings`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fee: fee, ads: ads })
+        });
+        const data = await res.json();
+        alert(data.message);
+        loadDashboardStats();
+    }
+
+    // D. गिफ्ट कॉइन और डिवाइस अनलॉक एक्शन
+    async function manageUser(action) {
+        const mobile = document.getElementById("target-mobile").value;
+        const amount = document.getElementById("gift-amount").value;
+
+        const res = await fetch(`${API_URL}/api/admin/control-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mobileNumber: mobile, action: action, amount: amount })
+        });
+        const data = await res.json();
+        alert(data.message);
+    }
+</script>
+</body>
+</html>
