@@ -315,6 +315,50 @@ def get_admin_dashboard():
         },
         "users_data_table": raw_users_list
     }), 200
+    # ==============================================================================
+# 🎮 GAME MODULE PART 1: DYNAMIC GENERATOR FOR GAME DEPOSIT
+# ==============================================================================
+
+@app.route('/api/game/generate-deposit-qr', methods=['POST'])
+def generate_game_deposit_qr():
+    data = request.get_json() or {}
+    game_id = data.get('game_id', '').strip()  # खिलाड़ी की गेम आईडी
+    amount = data.get('amount')
+
+    if not game_id or not amount:
+        return jsonify({"success": False, "message": "अमान्य गेम आईडी या राशि!"}), 400
+
+    try:
+        amount = float(amount)
+        if amount <= 0:
+            return jsonify({"success": False, "message": "राशि शून्य से अधिक होनी चाहिए!"}), 400
+    except ValueError:
+        return jsonify({"success": False, "message": "राशि केवल अंकों में होनी चाहिए!"}), 400
+
+    # 🎰 सुरक्षा चक्र: रैंडम 6-डिजिट का टोकन नंबर बनाना
+    random_token = "".join(random.choices(string.digits, k=6))
+    
+    # 💸 आपकी शर्त के अनुसार रैंडम गेम यूपीआई आईडी तैयार करना
+    generated_game_upi = f"pay-game-{random_token}@cw"
+
+    # डेटाबेस के 'game_sync_requests' डिब्बे में रिकॉर्ड को पेंडिंग लॉक करना
+    sync_doc = {
+        "game_id": game_id,
+        "amount": amount,
+        "game_upi_id": generated_game_upi,
+        "status": "Pending",  # शुरू में स्टेटस पेंडिंग रहेगा
+        "created_at": datetime.utcnow()
+    }
+    game_sync_col.insert_one(sync_doc)
+
+    # फ्रंटेंड को रिस्पॉन्स भेजना ताकि वह क्यूआर कोड और कॉपीड यूपीआई स्क्रीन पर दिखा सके
+    return jsonify({
+        "success": True,
+        "game_upi_id": generated_game_upi,
+        # यह स्ट्रिंग सीधे सेंट्रल वॉलेट ऐप का स्कैनर पहचान लेगा
+        "qr_data_string": f"centralwallet://pay?upi={generated_game_upi}&amount=${amount}&game_id=${game_id}"
+    }), 200
+    
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
