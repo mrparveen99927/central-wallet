@@ -3,201 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central Wallet - Live Profile</title>
+    <title>User Profile - Central Wallet</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
-        body { background: #000000; color: #ffffff; padding: 16px; padding-bottom: 50px; }
-
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; background: none; border: none; }
-        .help-icon { font-size: 20px; color: #ffffff; }
-
-        .user-info-card { background: #121212; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #1c1c1c; display: flex; align-items: center; gap: 14px; }
-        .profile-img-holder { width: 52px; height: 52px; background: #5f259f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; border: 2px solid #9d4edd; overflow: hidden; }
-        .profile-img-holder img { width: 100%; height: 100%; object-fit: cover; }
-        .user-name { font-size: 16px; font-weight: 700; text-transform: uppercase; }
-        .user-phone { font-size: 13px; color: #aaaaaa; margin-top: 3px; }
-
-        .qr-main-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 24px 16px; text-align: center; margin-bottom: 24px; }
-        .bank-header-row { font-size: 13px; color: #888888; font-weight: 500; margin-bottom: 20px; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 16px; padding-bottom: 40px; }
         
-        .qr-graphic-box { width: 180px; height: 180px; background: #ffffff; margin: 0 auto 20px auto; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .qr-row { display: flex; justify-content: space-between; width: 100%; height: 35px; }
-        .qr-square { width: 35px; height: 35px; background: #000000; border: 4px solid #ffffff; }
-        .qr-center-logo { position: absolute; width: 44px; height: 44px; background: #5f259f; border-radius: 50%; border: 3px solid #ffffff; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .view-details-link { color: #9d4edd; font-size: 13px; font-weight: 600; text-decoration: none; display: block; margin-top: 10px; }
-
-        .app-block-section { background: #121212; padding: 20px; border-radius: 12px; border: 1px solid #1c1c1c; margin-bottom: 24px; }
-        .section-title { font-size: 14px; font-weight: bold; color: #9d4edd; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 6px; }
-        .input-item-group { margin-bottom: 14px; }
-        .input-item-group label { display: block; font-size: 12px; color: #888; margin-bottom: 6px; }
-        .input-item-group input, .input-item-group select, .input-item-group textarea { width: 100%; padding: 12px; background: #000000; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 15px; outline: none; }
-        .save-settings-btn { width: 100%; padding: 14px; background: #10b981; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
-        .pe-list-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 4px; border-bottom: 1px solid #121212; cursor: pointer; }
-        .list-left-content { display: flex; align-items: center; gap: 16px; }
-        .list-icon-shape { font-size: 20px; color: #b3b3b3; width: 24px; text-align: center; }
-        .list-main-label { font-size: 14px; font-weight: 500; color: #ffffff; }
-        .list-arrow-right { font-size: 14px; color: #555555; }
-
-        .toggle-switch-container { position: relative; width: 44px; height: 24px; }
-        .toggle-switch-container input { opacity: 0; width: 0; height: 0; }
-        .slider-round-shape { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333333; transition: .3s; border-radius: 24px; }
-        .slider-round-shape:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider-round-shape { background-color: #10b981; }
-        input:checked + .slider-round-shape:before { transform: translateX(20px); }
-
-        .logout-text-btn { display: flex; align-items: center; gap: 16px; padding: 20px 4px; color: #ef4444; font-size: 14px; font-weight: 600; cursor: pointer; border-top: 1px solid #1c1c1c; margin-top: 20px; }
+        /* 🔙 यूनिवर्सल टॉप नेविगेशन */
+        .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        /* 👤 यूजर कार्ड और एडिट बटन */
+        .profile-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .user-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .user-info p { font-size: 14px; color: #9d4edd; font-weight: 600; letter-spacing: 0.5px; }
+        .edit-btn { background: #1c1c1c; border: 1px solid #334155; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        
+        /* 🔲 पर्सनल क्यूआर कोड एरिया */
+        .qr-section { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 24px 16px; text-align: center; margin-bottom: 24px; }
+        .qr-title { font-size: 14px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
+        .qr-box { width: 180px; height: 180px; background: #ffffff; margin: 0 auto; border-radius: 12px; padding: 10px; display: flex; justify-content: center; align-items: center; }
+        .qr-box img { width: 100%; height: 100%; }
+        
+        /* ⚙️ सेटिंग्स ऑप्शंस लिस्ट */
+        .setting-list { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 6px; margin-bottom: 24px; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1c1c1c; }
+        .setting-item:last-child { border-bottom: none; }
+        .item-left { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; }
+        .incoming-text { font-size: 12px; color: #666; font-weight: bold; }
+        
+        /* 📳 टॉगल बटन (Toggle Switch) */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #9d4edd; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        /* 🛑 लॉगआउट बटन */
+        .logout-btn { width: 100%; padding: 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-align: center; }
     </style>
 </head>
 <body>
 
+    <!-- 🔙 टॉप नेविगेशन बार -->
     <div class="top-nav">
-        <a href="dashboard.html" class="back-arrow">←</a>
-        <div class="help-icon" onclick="alert('Support System Connected')">❓</div>
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'">←</span>
+        <div class="page-title">Profile Settings</div>
+        <div style="width: 24px;"></div>
     </div>
 
-    <div class="user-info-card">
-        <div class="profile-img-holder" id="avatarBox">P</div>
-        <div>
-            <div class="user-name" id="lbl-display-name">PARVEEN</div>
-            <div class="user-phone" id="lbl-display-phone">+91 9992788757</div>
+    <!-- 👤 यूजर प्रोफाइल कार्ड -->
+    <div class="profile-card">
+        <div class="user-info">
+            <h2 id="prof-name">Loading...</h2>
+            <p id="prof-uid">UID: ------</p>
         </div>
+        <button class="edit-btn" onclick="alert('ℹ️ Profile editing features are coming soon via advanced form!')">Edit</button>
     </div>
 
-    <div class="qr-main-card">
-        <div class="bank-header-row">
-            <span>⚡ Scan QR to Transfer Wallet Coins</span>
-        </div>
-        <div class="qr-graphic-box">
-            <div class="qr-row">
-                <div class="qr-square"></div>
-                <div class="qr-square"></div>
-            </div>
-            <div class="qr-row" style="justify-content:flex-start;">
-                <div class="qr-square"></div>
-            </div>
-            <div class="qr-center-logo">पे</div>
-        </div>
-        <div class="view-details-link" id="lbl-display-upi-id">parveen@centralwallet</div>
-    </div>
-
-    <div class="app-block-section">
-        <div class="section-title">✏️ Edit Personal Details</div>
-        <div class="input-item-group">
-            <label>Profile Picture Link (URL)</label>
-            <input type="text" placeholder="Paste image web link here" id="in-photo">
-        </div>
-        <div class="input-item-group">
-            <label>Full Name</label>
-            <input type="text" placeholder="Enter Full Name" id="in-name" value="PARVEEN">
-        </div>
-        <div class="input-item-group">
-            <label>Username / Unique Nickname</label>
-            <input type="text" placeholder="e.g. parveen77" id="in-username" value="parveen">
-        </div>
-        <div class="input-item-group">
-            <label>Gender Selection</label>
-            <select id="in-gender">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-        </div>
-        <div class="input-item-group">
-            <label>Full Residential Address</label>
-            <textarea placeholder="Enter Address Details" id="in-address" rows="2"></textarea>
-        </div>
-        <button class="save-settings-btn" onclick="saveProfileChanges()">SAVE & UPDATE NOW</button>
-    </div>
-
-    <div class="pe-list-row">
-        <div class="list-left-content">
-            <span class="list-icon-shape">📱</span>
-            <div><div class="list-main-label">Shake to Scan</div></div>
-        </div>
-        <div class="toggle-switch-container">
-            <input type="checkbox" id="shakeToggle" checked>
-            <label class="slider-round-shape" for="shakeToggle"></label>
+    <!-- 🔲 पर्सनल क्यूआर कोड सेक्शन -->
+    <div class="qr-section">
+        <div class="qr-title">📲 Your Personal Payment QR</div>
+        <div class="qr-box">
+            <!-- यूजर की यूनिक आईडी का ऑटोमैटिक क्यूआर इमेज जनरेटर -->
+            <img id="user-qr-img" src="" alt="My QR Code">
         </div>
     </div>
 
-    <div class="pe-list-row" onclick="alert('Opening Preferences')">
-        <div class="list-left-content">
-            <span class="list-icon-shape">🎛️</span>
-            <div><div class="list-main-label">Preferences</div></div>
+    <!-- ⚙️ एडवांस सेटिंग्स लिस्ट -->
+    <div class="setting-list">
+        <!-- शेक टू स्कैन ऑन/ऑफ टॉगल -->
+        <div class="setting-item">
+            <div class="item-left"><span>📳</span><span>Shake to Scan Camera</span></div>
+            <label class="switch">
+                <input type="checkbox" id="shake-toggle" onchange="toggleShakeToScan()">
+                <span class="slider"></span>
+            </label>
         </div>
-        <span class="list-arrow-right">&gt;</span>
-    </div>
-
-    <div class="pe-list-row" onclick="alert('Opening Security')">
-        <div class="list-left-content">
-            <span class="list-icon-shape">🔒</span>
-            <div><div class="list-main-label">Security Settings</div></div>
+        <!-- परफॉरमेंस (भविष्य के लिए) -->
+        <div class="setting-item">
+            <div class="item-left"><span>⚡</span><span style="color:#666">Performance Boost</span></div>
+            <span class="incoming-text">COMING SOON</span>
         </div>
-        <span class="list-arrow-right">&gt;</span>
+        <!-- सिक्योरिटी (पासवर्ड बदलें) -->
+        <div class="setting-item" onclick="alert('ℹ️ Security password change tab will be linked with app.py encryption route!')" style="cursor: pointer;">
+            <div class="item-left"><span>🔒</span><span>Security & Password</span></div>
+            <span style="color:#555; font-weight:bold;">→</span>
+        </div>
     </div>
 
-    <div class="logout-text-btn" onclick="executeLogoutAction()">
-        <span style="font-size:18px;">🚪</span>
-        <span>Log out</span>
-    </div>
+    <!-- 🛑 लॉगआउट बटन -->
+    <button class="logout-btn" onclick="handleLogout()">Logout Account</button>
 
+<!-- जावास्क्रिप्ट भाग 2 में जुड़ेगी -->
+</body>
+</html>
 <script>
-    window.onload = function() {
-        let savedName = localStorage.getItem('user_name') || "PARVEEN";
-        let savedPhone = localStorage.getItem('user_phone') || "+91 9992788757";
-        let savedUsername = localStorage.getItem('user_id') || "parveen";
-        let savedPhoto = localStorage.getItem('user_photo') || "";
+    // पेज लोड होते ही यूजर का डेटा और क्यूआर कोड सेट करना
+    document.addEventListener("DOMContentLoaded", function() {
+        const uName = localStorage.getItem('user_name') || "User Name";
+        const uUid = localStorage.getItem('user_uid') || "CW00000";
+        const shakeSetting = localStorage.getItem('shake_to_scan') === 'true';
 
-        document.getElementById('lbl-display-name').innerText = savedName;
-        document.getElementById('lbl-display-phone').innerText = savedPhone;
-        document.getElementById('lbl-display-upi-id').innerText = `${savedUsername.toLowerCase()}@centralwallet`;
+        // स्क्रीन पर नाम और UID दिखाना
+        document.getElementById('prof-name').innerText = uName;
+        document.getElementById('prof-uid').innerText = `UID: ${uUid}`;
 
-        document.getElementById('in-name').value = savedName;
-        document.getElementById('in-username').value = savedUsername;
-        document.getElementById('in-photo').value = savedPhoto;
+        // शेक टू स्कैन का टॉगल बटन सेट करना
+        document.getElementById('shake-toggle').checked = shakeSetting;
 
-        const avatarBox = document.getElementById('avatarBox');
-        if(savedPhoto.trim() !== "") {
-            avatarBox.innerHTML = `<img src="${savedPhoto}" alt="User Profile">`;
+        // 📲 आपके पर्सनल UID का ऑटोमैटिक लाइव क्यूआर कोड जनरेटर (Google API द्वारा)
+        // दूसरा यूजर इसे स्कैन करके सीधे पैसे भेज सकेगा
+        const qrImgElement = document.getElementById('user-qr-img');
+        const qrData = `centralwallet://pay?uid=${uUid}&name=${encodeURIComponent(uName)}`;
+        qrImgElement.src = `https://qrserver.com{encodeURIComponent(qrData)}`;
+    });
+
+    // 📳 शेक टू स्कैन ऑन/ऑफ टॉगल फंक्शन
+    function toggleShakeToScan() {
+        const isChecked = document.getElementById('shake-toggle').checked;
+        localStorage.setItem('shake_to_scan', isChecked);
+        if(isChecked) {
+            alert("✅ Shake to Scan चालू हो गया! होम पेज पर फोन हिलाते ही कैमरा खुल जाएगा।");
         } else {
-            avatarBox.innerText = savedName.charAt(0).toUpperCase();
+            alert("📳 Shake to Scan बंद कर दिया गया है।");
         }
-    };
-
-    function saveProfileChanges() {
-        const newName = document.getElementById('in-name').value.trim();
-        const newPhoto = document.getElementById('in-photo').value.trim();
-        const newUsername = document.getElementById('in-username').value.replace('@', '').trim();
-
-        if(!newName || !newUsername) {
-            alert("❌ Name and Username fields cannot be empty!");
-            return;
-        }
-
-        localStorage.setItem('user_name', newName);
-        localStorage.setItem('user_id', newUsername);
-        localStorage.setItem('user_photo', newPhoto);
-
-        document.getElementById('lbl-display-name').innerText = newName;
-        const formattedUpi = newUsername.replace('@', '').toLowerCase();
-        document.getElementById('lbl-display-upi-id').innerText = `${formattedUpi}@centralwallet`;
-
-        const avatarBox = document.getElementById('avatarBox');
-        if(newPhoto !== "") {
-            avatarBox.innerHTML = `<img src="${newPhoto}" alt="User Profile">`;
-        } else {
-            avatarBox.innerText = newName.charAt(0).toUpperCase();
-        }
-
-        alert("✅ Profile Details Saved Successfully!");
     }
 
-    function executeLogoutAction() {
-        if(confirm("🚪 Log out from Central Wallet?")) {
-            window.location.href = "index.html"; 
+    // 🛑 कंफर्मेशन पॉप-अप के साथ सुरक्षित लॉगआउट लॉजिक
+    function handleLogout() {
+        const confirmClear = confirm("⚠️ क्या आप सच में इस सेंट्रल वॉलेट अकाउंट से लॉगआउट करना चाहते हैं?");
+        if (confirmClear) {
+            // लोकल ब्राउज़र मेमोरी को पूरी तरह साफ़ करना
+            localStorage.clear();
+            alert("🔒 आप सुरक्षित रूप से लॉगआउट हो चुके हैं।");
+            // वापस लॉगिन पेज पर फेंकना
+            window.location.href = "index.html";
         }
     }
 </script>
-</body>
-</html>

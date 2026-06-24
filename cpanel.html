@@ -1,141 +1,278 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N&N Network - Secure CPanel</title>
+    <title>Central Wallet - Master cPanel</title>
     <style>
-        body { background-color: #0b0b16; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
-        .container { max-width: 900px; margin: auto; }
-        .card { background: #151530; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #311b92; }
-        h2 { color: #b388ff; border-bottom: 20px; margin-top: 0; }
-        input, select { background: #222244; color: white; border: 1px solid #4a148c; padding: 10px; border-radius: 6px; width: 95%; margin-bottom: 15px; }
-        button { background: #6a1b9a; color: white; font-weight: bold; border: none; padding: 11px 20px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #8e24aa; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .hidden { display: none; }
-        .badge { background: #4a148c; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 16px; min-height: 100vh; position: relative; overflow-x: hidden; }
+        
+        /*    */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #1c1c1c; padding-bottom: 12px; }
+        .menu-toggle { font-size: 24px; color: #9d4edd; cursor: pointer; user-select: none; }
+        .panel-title { font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; }
+        
+        /*      */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 12px; padding: 14px; text-align: left; }
+        .stat-title { font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { font-size: 18px; font-weight: 800; color: #9d4edd; }
+
+        /*     */
+        .cpanel-box { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 16px; margin-bottom: 24px; display: none; }
+        .section-header-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { color: #888; padding: 10px 8px; border-bottom: 2px solid #1c1c1c; text-transform: uppercase; font-size: 11px; }
+        td { padding: 12px 8px; border-bottom: 1px solid #1c1c1c; white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        .user-uid { color: #9d4edd; font-weight: bold; }
+        
+        /*    */
+        .action-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-approve { background: #10b981; color: white; margin-right: 6px; }
+        .btn-reject { background: #ef4444; color: white; }
+
+        /*        (Sidebar) */
+        .sidebar-overlay { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: #0a0a0a; border-right: 2px solid #9d4edd; z-index: 1000; transition: 0.3s; padding: 20px; }
+        .sidebar-overlay.open { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #1c1c1c; padding-bottom: 12px; }
+        .close-menu { font-size: 24px; color: #666; cursor: pointer; }
+        
+        .menu-list { display: flex; flex-direction: column; gap: 6px; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; color: #aaa; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .menu-item:active, .menu-item.active-purple { background: rgba(157, 78, 221, 0.15); color: #9d4edd; border-left: 4px solid #9d4edd; }
+        .incoming-badge { font-size: 9px; background: #ef4444; color: white; padding: 1px 4px; border-radius: 4px; font-weight: bold; margin-left: auto; }
+        
+        .backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 999; display: none; }
+        .backdrop.show { display: block; }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <!-- खंड 1: एडमिन लॉगिन लॉक -->
-    <div id="login-section" class="card">
-        <h2>🔐 N&N Gateway - Admin Secure Login</h2>
-        <input type="text" id="admin-user" placeholder="एडमिन यूजरनाम">
-        <input type="password" id="admin-pass" placeholder="गुप्त पासवर्ड">
-        <button onclick="loginAdmin()">प्रवेश करें (Verify Session)</button>
+    <!--     -->
+    <div id="menu-backdrop" class="backdrop" onclick="toggleSidebar(false)"></div>
+
+    <!--        -->
+    <div id="sidebar-menu" class="sidebar-overlay">
+        <div class="sidebar-header">
+            <div style="font-size: 16px; font-weight: 800; color: #9d4edd;"> cPanel Menu</div>
+            <span class="close-menu" onclick="toggleSidebar(false)"></span>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item active-purple" id="menu-dashboard" onclick="switchCPanelTab('dashboard')"> Dashboard Overview</div>
+            <div class="menu-item" id="menu-withdrawal" onclick="switchCPanelTab('withdrawal')"> Withdrawal Requests</div>
+            <div class="menu-item" id="menu-deposit" onclick="switchCPanelTab('deposit')"> Deposit Requests (UTR)</div>
+            <div class="menu-item" id="menu-dep-history" onclick="switchCPanelTab('dep-history')"> Deposit History</div>
+            <div class="menu-item" id="menu-wit-history" onclick="switchCPanelTab('wit-history')"> Withdrawal History</div>
+            <div class="menu-item"><div style="color:#555"> Game Control</div><span class="incoming-badge">FUTURE</span></div>
+        </div>
     </div>
 
-    <!-- खंड 2: मुख्य CPanel (लॉगिन के बाद ही दिखेगा) -->
-    <div id="main-cpanel" class="hidden">
+    <!--      -->
+    <div class="top-bar">
+        <span class="menu-toggle" onclick="toggleSidebar(true)"></span>
+        <div class="panel-title">Central cPanel</div>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <!--    1:   ( +   ) -->
+    <!--               -->
+    <div id="sec-dashboard" style="display: block;">
         
-        <h2>📊 लाइव गेटवे डैशबोर्ड (Real-time Stats)</h2>
-        <div class="card grid">
-            <div>👥 कुल रजिस्टर्ड यूज़र्स: <span id="stat-users" class="badge">0</span></div>
-            <div>⏳ पेंडिंग UTR डिपॉजिट: <span id="stat-utr" class="badge">0</span></div>
+        <!--    -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-title">Accounts Today</div><div id="stat-new-users" class="stat-value">0</div></div>
+            <div class="stat-card"><div class="stat-title">Total Users</div><div id="stat-total-users" class="stat-value">0</div></div>
+            <div class="stat-card"><div class="stat-title">Total Deposited</div><div id="stat-total-dep" class="stat-value">0.00</div></div>
+            <div class="stat-card"><div class="stat-title">Total Withdrawn</div><div id="stat-total-wit" class="stat-value">0.00</div></div>
         </div>
 
-        <h2>⚙️ गेटवे रिमोट कंट्रोल्स (Gateway Engine Settings)</h2>
-        <div class="card grid">
-            <div>
-                <label>🏦 ट्रांसफर विड्रॉल फीस (%):</label>
-                <input type="number" id="fee-input" min="3" max="5" step="0.5">
-                <button onclick="saveGatewaySettings()">फीस अपडेट करें</button>
-            </div>
-            <div>
-                <label>📢 गूगल / यूनिटी विज्ञापन:</label>
-                <select id="ads-toggle">
-                    <option value="true">ON (विज्ञापन चालू रखें)</option>
-                    <option value="false">OFF (विज्ञापन बंद करें)</option>
-                </select>
-                <button onclick="saveGatewaySettings()">Ads स्टेटस बदलें</button>
-            </div>
-        </div>
-
-        <h2>👤 यूज़र और डिवाइस लॉक मैनेजमेंट (Anti-Fraud)</h2>
-        <div class="card">
-            <input type="text" id="target-mobile" placeholder="यूज़र का 10-डिजिट मोबाइल नंबर">
-            <div class="grid">
-                <div>
-                    <input type="number" id="gift-amount" placeholder="गिफ्ट कॉइन्स अमाउंट (₹)">
-                    <button onclick="manageUser('gift')">🎁 कॉइन्स क्रेडिट करें</button>
-                </div>
-                <div style="text-align: center; margin-top: 15px;">
-                    <button style="background:#c62828" onclick="manageUser('unlock_device')">🔓 डिवाइस लॉक खोलें (Reset UUID)</button>
-                </div>
+        <!--    -->
+        <div class="cpanel-box" style="display: block;">
+            <div class="section-header-title"> Registered Members Data Table</div>
+            <div style="width: 100%; overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>UID</th><th>Name</th><th>Mobile Number</th><th>Gmail ID</th><th>Wallet Balance</th><th>Security Hash</th></tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr><td colspan="6" style="text-align: center; color: #666; padding: 20px;">Loading database records...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
     </div>
-</div>
 
+    <!-- 2 :    -->
+    <div class="cpanel-box" id="sec-withdrawal">
+        <div class="section-header-title" style="color: #ef4444;"> Pending Withdrawal Requests</div>
+        <div style="width: 100%; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>User UID</th><th>Method</th><th>Details</th><th>Amount</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="withdrawal-table-body">
+                    <tr><td colspan="5" style="text-align: center; color: #666; padding: 20px;">No pending cashout requests.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3 :  UTR   -->
+    <div class="cpanel-box" id="sec-deposit">
+        <div class="section-header-title" style="color: #10b981;"> Pending UTR Deposit Requests</div>
+        <div style="width: 100%; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>User UID</th><th>12-Digit UTR Number</th><th>Amount</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="deposit-table-body">
+                    <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">No pending UTR token requests.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4 :    -->
+    <div class="cpanel-box" id="sec-dep-history">
+        <div class="section-header-title"> Successful Deposits Log</div>
+        <div style="width: 100%; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>User UID</th><th>UTR Number</th><th>Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody id="dephistory-table-body">
+                    <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">History logs are clean.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 5 :    -->
+    <div class="cpanel-box" id="sec-wit-history">
+        <div class="section-header-title"> Successful Withdrawals Log</div>
+        <div style="width: 100%; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>User UID</th><th>Method</th><th>Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody id="withistory-table-body">
+                    <tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">History logs are clean.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!--   2   -->
 <script>
-    const API_URL = "https://central-wallet.onrender.com";
+    //      
+    const API_URL = "https://central-wallet-1.onrender.com";
 
-
-
-    // A. एडमिन लॉगिन लॉजिक
-    async function loginAdmin() {
-        const u = document.getElementById("admin-user").value;
-        const p = document.getElementById("admin-pass").value;
-
-        try {
-            const res = await fetch(`${API_URL}/api/admin/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: u, password: p })
-            });
-            const data = await res.json();
-            if(res.ok) {
-                document.getElementById("login-section").classList.add("hidden");
-                document.getElementById("main-cpanel").classList.remove("hidden");
-                loadDashboardStats();
-            }
-        } catch(e) { alert("गलत क्रेडेंशियल्स! दोबारा प्रयास करें।"); }
-    }
-
-    // B. डैशबोर्ड डेटा लोड करना
-    async function loadDashboardStats() {
-        const res = await fetch(`${API_URL}/api/admin/dashboard-stats`);
-        const data = await res.json();
-        if(data.success) {
-            document.getElementById("stat-users").innerText = data.totalUsers;
-            document.getElementById("stat-utr").innerText = data.pendingUtrCount;
-            document.getElementById("fee-input").value = data.currentFee;
-            document.getElementById("ads-toggle").value = data.adsStatus.toString();
+    //          
+    function toggleSidebar(openMode) {
+        const sidebar = document.getElementById('sidebar-menu');
+        const backdrop = document.getElementById('menu-backdrop');
+        
+        if (openMode) {
+            sidebar.classList.add('open');
+            backdrop.classList.add('show');
+        } else {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('show');
         }
     }
 
-    // C. सेटिंग्स अपडेट करना (फीस और विज्ञापन)
-    async function saveGatewaySettings() {
-        const fee = document.getElementById("fee-input").value;
-        const ads = document.getElementById("ads-toggle").value === "true";
+    //  - :              
+    function switchCPanelTab(tabName) {
+        // 1.     
+        toggleSidebar(false);
 
-        const res = await fetch(`${API_URL}/api/admin/update-settings`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fee: fee, ads: ads })
+        // 2.    5   ()  
+        const tabsList = ['dashboard', 'withdrawal', 'deposit', 'dep-history', 'wit-history'];
+
+        // 3.       (display = 'none')      
+        tabsList.forEach(t => {
+            const secElement = document.getElementById(`sec-${t}`);
+            if (secElement) {
+                if (t === tabName) {
+                    secElement.style.display = 'block'; //     
+                } else {
+                    secElement.style.display = 'none';  //   ( )     
+                }
+            }
         });
-        const data = await res.json();
-        alert(data.message);
-        loadDashboardStats();
+
+        // 4.        
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => item.classList.remove('active-purple'));
+        
+        const activeMenu = document.getElementById(`menu-${tabName}`);
+        if (activeMenu) {
+            activeMenu.classList.add('active-purple');
+        }
     }
 
-    // D. गिफ्ट कॉइन और डिवाइस अनलॉक एक्शन
-    async function manageUser(action) {
-        const mobile = document.getElementById("target-mobile").value;
-        const amount = document.getElementById("gift-amount").value;
+    //      MongoDB     
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchAdminDashboardData();
+    });
 
-        const res = await fetch(`${API_URL}/api/admin/control-user`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobileNumber: mobile, action: action, amount: amount })
-        });
-        const data = await res.json();
-        alert(data.message);
+    //          
+    async function fetchAdminDashboardData() {
+        const usersTableBody = document.getElementById('users-table-body');
+
+        try {
+            //         
+            const response = await fetch(`${API_URL}/api/admin/dashboard`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "admin",
+                    password: "Parveen999" //     
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok || result.success) {
+                // 1.    (Stats)      
+                document.getElementById('stat-new-users').innerText = result.statistics.new_users_today;
+                document.getElementById('stat-total-users').innerText = result.statistics.total_users;
+                document.getElementById('stat-total-dep').innerText = `${parseFloat(result.statistics.total_deposited_money).toFixed(2)}`;
+                document.getElementById('stat-total-wit').innerText = `${parseFloat(result.statistics.total_withdrawn_money).toFixed(2)}`;
+
+                // 2.        
+                if (result.users_data_table && result.users_data_table.length > 0) {
+                    usersTableBody.innerHTML = ""; //  'Loading...'  
+
+                    result.users_data_table.forEach(user => {
+                        const trHtml = `
+                            <tr>
+                                <td class="user-uid">${user.uid}</td>
+                                <td><b>${user.name}</b></td>
+                                <td>${user.mobile}</td>
+                                <td>${user.gmail}</td>
+                                <td style="color: #10b981; font-weight: bold;">${parseFloat(user.balance).toFixed(2)}</td>
+                                <td style="color: #666; font-style: italic;">${user.password_hash_hidden}</td>
+                            </tr>
+                        `;
+                        usersTableBody.innerHTML += trHtml;
+                    });
+                } else {
+                    usersTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">      </td></tr>`;
+                }
+            } else {
+                usersTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444;"> : ${result.message}</td></tr>`;
+            }
+        } catch (err) {
+            //      
+            usersTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #f59e0b;">       (cPanel Display Ready)</td></tr>`;
+            console.error(err);
+        }
     }
 </script>
+
 </body>
 </html>

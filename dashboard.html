@@ -3,189 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N&N Token Platform - Dashboard</title>
+    <title>Central Wallet - Home Dashboard</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: #000000; color: #ffffff; padding-bottom: 110px; }
+        body { background: #000000; color: #ffffff; padding: 16px; padding-bottom: 90px; }
         
-        .pe-top-nav { background: #1a0933; padding: 15px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1254; }
-        .user-avatar { width: 34px; height: 34px; background: #5f259f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; border: 1px solid #9d4edd; font-size: 14px; text-decoration: none; color: white; }
-        .header-logo { font-size: 16px; font-weight: 700; color: #ffffff; }
-        .help-icon { font-size: 18px; color: #ffffff; background: none; border: none; cursor: pointer; }
-        .ads-placement-holder { background: #141414; margin: 12px; padding: 15px; border-radius: 8px; border: 1px dashed #5f259f; text-align: center; color: #888888; font-size: 12px; font-weight: 600; }
-        .promo-banner { background: linear-gradient(135deg, #2d0c5a, #5f259f); margin: 0 12px 12px 12px; padding: 20px; border-radius: 12px; border: 1px solid #4a148c; }
-        .banner-title { font-size: 20px; font-weight: 800; color: #fff; }
-        .banner-sub { font-size: 12px; color: #d8b4fe; margin-top: 4px; }
-        
-        /* Secure Balance Card Style */
-        .wallet-balance-card { background: #121212; margin: 12px; padding: 16px; border-radius: 12px; border: 1px solid #1c1c1c; text-align: center; }
-        .bal-txt { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bal-val { font-size: 30px; font-weight: 700; color: #10b981; margin: 5px 0; letter-spacing: 1px; }
+        /*     */
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 5px 0; }
+        .logo-text { font-size: 20px; font-weight: 800; color: #fff; }
+        .profile-icon-btn { width: 40px; height: 40px; background: #9d4edd; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; border: 2px solid #1c1c1c; }
 
-        .pe-section { background: #121212; margin: 12px; padding: 16px; border-radius: 12px; border: 1px solid #1c1c1c; }
-        .section-title { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 16px; text-transform: uppercase; }
-        .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; }
-        .grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-decoration: none; }
-        .icon-circle { width: 56px; height: 56px; background: #1f0f33; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; margin-bottom: 10px; border: 1px solid #351a54; }
-        .item-label { font-size: 11px; color: #aaaaaa; font-weight: 500; line-height: 14px; }
-        .icon-square-shape { width: 50px; height: 50px; background: #181818; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; margin-bottom: 8px; border: 1px solid #262626; }
+        /*        */
+        .ad-banner { width: 100%; height: 75px; background: #1a1a1a; border: 1px dashed #334155; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: #666; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+        .bottom-ad { margin-top: 25px; margin-bottom: 10px; }
+
+        .section-header { font-size: 13px; font-weight: bold; color: #9d4edd; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
         
-        .bottom-phonepe-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0d0d0d; height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1c1c1c; z-index: 1000; padding-bottom: 5px; }
-        .bar-link-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #777777; font-size: 11px; font-weight: 600; cursor: pointer; flex: 1; height: 100%; }
-        .bar-raw-icon { font-size: 20px; margin-bottom: 4px; }
-        .bar-link-item.active { color: #ffffff; }
-        .bar-link-item.scan-center-floating { position: relative; margin-top: -34px; flex: none; width: 76px; height: 76px; z-index: 1001; }
-        .scan-purple-circle { width: 60px; height: 60px; background: #5f259f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; color: white; border: 4px solid #000000; box-shadow: 0 -4px 14px rgba(95, 37, 159, 0.45); }
+        /*  4    */
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+        .grid-box { background: #121212; border: 1px solid #1c1c1c; border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .grid-box:active { background: #1a1a1a; transform: scale(0.98); }
+        .box-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+        .box-title { font-size: 14px; font-weight: 600; color: #fff; }
+        .coming-soon-tag { font-size: 10px; color: #9d4edd; background: rgba(157, 78, 221, 0.15); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; font-weight: bold; }
+
+        /*     */
+        .list-container { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 6px; margin-bottom: 20px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1c1c1c; cursor: pointer; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item-left { display: flex; align-items: center; gap: 12px; }
+        .list-text { font-size: 15px; font-weight: 500; }
+        .arrow-right { color: #555; font-weight: bold; }
+        .incoming-tag { font-size: 11px; color: #ef4444; font-weight: bold; }
+
+        /*     (Fixed) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #0a0a0a; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #888; font-size: 11px; font-weight: 600; cursor: pointer; width: 20%; }
+        .nav-btn.active { color: #9d4edd; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="pe-top-nav">
-        <a href="profile.html" class="user-avatar" id="nav-avatar">U</a>
-        <div class="header-logo" id="header-user-name">🔮 N&N Network</div>
-        <button class="help-icon" onclick="alert('Support Active')">❓</button>
+    <!--      (Top Area) -->
+    <div class="top-header">
+        <div class="logo-text">Central <span style="color:#9d4edd;">Wallet</span></div>
+        <div class="profile-icon-btn" onclick="goToPage('profile.html')"></div>
     </div>
 
-    <div class="ads-placement-holder">📢 ADVERTISEMENT SLOT LIVE HERE</div>
+    <!--     -->
+    <div class="ad-banner" id="top-ad-box"> TOP AD BANNER PLACEHOLDER</div>
 
-    <div class="promo-banner">
-        <div class="banner-title">🎮 N&N ALPHA ARENA</div>
-        <div class="banner-sub">Play 100 Persons Game & Win 95x N&N Tokens!</div>
-    </div>
+    <!--       -->
+    <div class="section-header">money transfer</div>
 
-    <!-- Secure Balance Card (टोकन्स शुरू में छुपे रहेंगे) -->
-    <div class="wallet-balance-card">
-        <div class="bal-txt">N&N Tokens Balance</div>
-        <div class="bal-val" id="display-balance">💎 ••••••</div>
-    </div>
-
-    <div class="pe-section">
-        <div class="section-title">Money Transfers</div>
-        <div class="icon-grid">
-            <div class="grid-item" onclick="executeTokenTransfer()">
-                <div class="icon-circle">📱</div>
-                <span class="item-label">To Mobile<br>Number</span>
-            </div>
-            <!-- सीधे गिटहब वाले गेम लिंक से कनेक्टेड बटन -->
-            <a href="game.html" class="grid-item">
-                <div class="icon-circle" style="background:linear-gradient(135deg, #5f259f, #3c1375); border:none;">🎯</div>
-                <span class="item-label" style="color:#d8b4fe; font-weight:bold;">Play Game<br>(Class A-D)</span>
-            </a>
-            <div class="grid-item" onclick="alert('Deposit via Profile Manage Payments Settings')">
-                <div class="icon-circle">📥</div>
-                <span class="item-label">Add Tokens<br>(QR / UTR)</span>
-            </div>
-            <!-- पिन मांगकर बैलेंस दिखाने वाला असली सिक्योर बटन -->
-            <div class="grid-item" onclick="checkSecureBalance()">
-                <div class="icon-circle" style="color:#d8b4fe; background:#24123a;">💸</div>
-                <span class="item-label" style="color:#d8b4fe; font-weight:bold;">Check<br>Balance</span>
-            </div>
+    <!-- 4   (To Mobile, To UPI, Play Game, Check Balance) -->
+    <div class="grid-container">
+        <div class="grid-box" onclick="goToPage('search_user.html')">
+            <span class="box-icon"></span>
+            <span class="box-title">To Mobile</span>
+        </div>
+        <div class="grid-box" onclick="goToPage('pay_to_upi.html')">
+            <span class="box-icon"></span>
+            <span class="box-title">To UPI</span>
+        </div>
+        <div class="grid-box">
+            <span class="box-icon"></span>
+            <span class="box-title">Play Game</span>
+            <span class="coming-soon-tag">Bhavishya</span>
+        </div>
+        <div class="grid-box" onclick="goToPage('check_balance.html')">
+            <span class="box-icon"></span>
+            <span class="box-title">Check Balance</span>
         </div>
     </div>
 
-    <div class="pe-section">
-        <div class="section-title">Wallet Settings</div>
-        <div class="icon-grid">
-            <div class="grid-item" onclick="alert('Withdraw via Profile Manage Payments Settings')">
-                <div class="icon-square-shape" style="background:#2d0b0b; border-color:#4a1212; color:#fca5a5;">💰</div>
-                <span class="item-label">Request<br>Withdrawal</span>
-            </div>
-            <div class="grid-item" onclick="alert('Referral Link Copied!')">
-                <div class="icon-square-shape" style="background:#0b2d1a; border-color:#124a29; color:#a7f3d0;">🤝</div>
-                <span class="item-label">Invite<br>Friends</span>
-            </div>
+    <!--    -->
+    <div class="section-header">wallet setting</div>
+
+    <!-- 8    (2 , 6  ) -->
+    <div class="list-container">
+        <div class="list-item" onclick="goToPage('withdraw.html')">
+            <div class="list-item-left"><span></span><span class="list-text">Request Withdrawal</span></div>
+            <span class="arrow-right"></span>
         </div>
+        <div class="list-item" onclick="goToPage('invite.html')">
+            <div class="list-item-left"><span></span><span class="list-text">Invite Friend</span></div>
+            <span class="arrow-right"></span>
+        </div>
+        <!-- 6    -->
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">Linked Cards</span></div><span class="incoming-tag">Incoming Soon</span></div>
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">Analytics</span></div><span class="incoming-tag">Incoming Soon</span></div>
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">Rewards Hub</span></div><span class="incoming-tag">Incoming Soon</span></div>
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">Bill Payments</span></div><span class="incoming-tag">Incoming Soon</span></div>
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">Support Chat</span></div><span class="incoming-tag">Incoming Soon</span></div>
+        <div class="list-item"><div class="list-item-left"><span></span><span class="list-text" style="color:#666">VIP Membership</span></div><span class="incoming-tag">Incoming Soon</span></div>
     </div>
 
-    <div class="bottom-phonepe-bar">
-        <button class="bar-link-item active">
-            <span class="bar-raw-icon">🏠</span><span>Home</span>
+    <!--     -->
+    <div class="ad-banner bottom-ad" id="bottom-ad-box"> BOTTOM AD BANNER PLACEHOLDER</div>
+
+    <!--      (5 ) -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="goToPage('dashboard.html')">
+            <span class="nav-icon"></span><span>Home</span>
         </button>
-        <button class="bar-link-item" onclick="alert('Search Active')">
-            <span class="bar-raw-icon">🔍</span><span>Search</span>
+        <button class="nav-btn" onclick="alert(' Search feature coming soon!')">
+            <span class="nav-icon"></span><span>Search</span>
         </button>
-        <button class="bar-link-item scan-center-floating" onclick="alert('Scanning QR...')">
-            <div class="scan-purple-circle">🔲</div>
+        <button class="nav-btn" onclick="alert(' Scan feature coming soon!')">
+            <span class="nav-icon"></span><span>Scan</span>
         </button>
-        <button class="bar-link-item" onclick="alert('Alerts Cleared')">
-            <span class="bar-raw-icon">🔔</span><span>Alerts</span>
+        <button class="nav-btn" onclick="goToPage('alerts.html')">
+            <span class="nav-icon"></span><span>Alert</span>
         </button>
-        <button class="bar-link-item" onclick="alert('History Statement Loaded')">
-            <span class="bar-raw-icon">📜</span><span>History</span>
+        <button class="nav-btn" onclick="goToPage('history.html')">
+            <span class="nav-icon"></span><span>History</span>
         </button>
     </div>
 
+<!--   2   -->
 <script>
-    window.onload = function() {
-        let name = localStorage.getItem('user_name') || "User";
-        document.getElementById('header-user-name').innerText = `👋 ${name}`;
-        document.getElementById('nav-avatar').innerText = name.charAt(0).toUpperCase();
-        // स्क्रीन लोड होने पर बैलेंस को हमेशा लॉक रखना
-        document.getElementById('display-balance').innerText = "💎 ••••••";
-    };
-
-    // 🔒 Check Balance पिन लॉक सिक्योरिटी फंक्शन
-    function checkSecureBalance() {
-        const pinInput = prompt("🔒 SECURITY LOCK\n\nEnter your 4-Digit Login MPIN to view balance:");
-        if (pinInput === null) return;
-
-        // टेस्ट और लोकल फ्लो के लिए डेटाबेस से सेव पिन चेक करना
-        // (अगर रजिस्ट्रेशन पेज पर कोई नया पिन बनाया है तो यह उसे वैलिडेट करेगा, वर्न्स डिफॉल्ट '1234' मान लेगा)
-        let registeredUserPhone = localStorage.getItem('user_phone') || "";
-        let dbUserDataRaw = localStorage.getItem(`db_user_${registeredUserPhone}`);
-        let correctMpin = "1234"; // डिफॉल्ट पिन
-
-        if(dbUserDataRaw) {
-            let dbUserObj = JSON.parse(dbUserDataRaw);
-            correctMpin = dbUserObj.mpin;
-        }
-
-        if (pinInput === correctMpin) {
-            let balance = parseFloat(localStorage.getItem('user_balance') || "500.00");
-            document.getElementById('display-balance').innerText = `💎 ${balance.toFixed(2)} N&N`;
-            alert(`✅ PIN Verified!\n\nYour Current Available Balance is: ${balance.toFixed(2)} N&N Tokens.`);
-        } else {
-            alert("❌ Access Denied: Incorrect 4-Digit MPIN Pin! Please try again.");
-            document.getElementById('display-balance').innerText = "💎 ••••••";
-        }
+    //     :     -   
+    const userUid = localStorage.getItem('user_uid');
+    if (!userUid) {
+        alert("  !    ");
+        window.location.href = "index.html";
     }
 
-    // 🔄 लाइव वॉलेट-टू-वॉलेट ट्रांसफर फंक्शन
-    async function executeTokenTransfer() {
-        const receiver = prompt("📱 Enter Receiver Wallet Mobile Number (10 Digit):");
-        if(!receiver || receiver.length !== 10) return;
+    //      (      )
+    function goToPage(pageName) {
+        window.location.href = pageName;
+    }
 
-        const amtInput = prompt("💎 Enter Amount of N&N Tokens to send:");
-        if(!amtInput || isNaN(parseFloat(amtInput)) || parseFloat(amtInput) <= 0) return;
-        const amt = parseFloat(amtInput);
+    // ==============================================================================
+    //   --  (SHAKE TO SCAN LOGIC)
+    // ==============================================================================
+    let lastX = null, lastY = null, lastZ = null;
+    let shakeThreshold = 15; //     (Sensitivity)
+    let lastTime = 0;
 
-        let currentBal = parseFloat(localStorage.getItem('user_balance') || "500.00");
-        if(amt > currentBal) {
-            alert("❌ Transfer Failed: Insufficient N&N Tokens Balance!"); return;
-        const sender = localStorage.getItem('user_phone');
+    //              
+    const shakeSetting = localStorage.getItem('shake_to_scan') === 'true';
 
-        try {
-            // लाइव रेंडर इंजन पर डेटा अपडेट के लिए हिट मारना
-            const response = await fetch('https://onrender.com', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender_mobile: sender, receiver_mobile: receiver, amount: amt })
-            });
-            const result = await response.json();
-            alert(result.message);
-            
-            // डेटाबेस में सफल होने पर लोकल बैलेंस अपडेट
-            let newBal = currentBal - amt;
-            localStorage.setItem('user_balance', newBal);
-            document.getElementById('display-balance').innerText = "💎 ••••••"; // सुरक्षा के लिए वापस छुपाना
-        } catch (err) {
-            // ऑफलाइन/लोकल मोड के लिए बैकअप सक्सेस रूल
-            let newBal = currentBal - amt;
-            localStorage.setItem('user_balance', newBal);
-            document.getElementById('display-balance').innerText = "💎 ••••••";
-            alert(`✅ [Local Cloud] Transferred ${amt} N&N Tokens to ${receiver} successfully!`);
-        }
+    if (shakeSetting && window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', function(event) {
+            let current = event.accelerationIncludingGravity;
+            let currentTime = new Date().getTime();
+
+            if ((currentTime - lastTime) > 100) {
+                let diffTime = currentTime - lastTime;
+                lastTime = currentTime;
+
+                let x = current.x;
+                let y = current.y;
+                let z = current.z;
+
+                if (lastX !== null && lastY !== null && lastZ !== null) {
+                    //     
+                    let deltaX = Math.abs(lastX - x);
+                    let deltaY = Math.abs(lastY - y);
+                    let deltaZ = Math.abs(lastZ - z);
+
+                    //         
+                    if ((deltaX > shakeThreshold && deltaY > shakeThreshold) || 
+                        (deltaX > shakeThreshold && deltaZ > shakeThreshold) || 
+                        (deltaY > shakeThreshold && deltaZ > shakeThreshold)) {
+                        
+                        //            
+                        alert(" Shake Detected! Opening camera stream...");
+                    }
+                }
+
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        });
     }
 </script>
+
 </body>
 </html>

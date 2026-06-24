@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Friends - Central Wallet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 20px; min-height: 100vh; }
+        
+        /* 🔙 यूनिवर्सल टॉप नेविगेशन */
+        .top-nav { display: flex; align-items: center; margin-bottom: 24px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; margin-right: 15px; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        /* 🎫 इनवाइट कोड बॉक्स */
+        .invite-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 24px 16px; text-align: center; margin-bottom: 20px; }
+        .card-txt { font-size: 13px; color: #aaa; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; }
+        .code-row { display: flex; background: #000000; border: 1px dashed #9d4edd; border-radius: 10px; padding: 12px; justify-content: space-between; align-items: center; max-width: 260px; margin: 0 auto 20px auto; }
+        .invite-code { font-size: 20px; font-weight: 800; color: #9d4edd; letter-spacing: 1px; }
+        .copy-btn { background: #9d4edd; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        /* 📢 सोशल शेयर बटन्स */
+        .share-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+        .share-btn { padding: 12px 6px; border: none; border-radius: 10px; color: white; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .btn-wa { background: #25D366; }
+        .btn-tg { background: #0088cc; }
+        .btn-ig { background: #E1306C; }
+        .share-icon { font-size: 18px; }
+
+        /* 📊 कमाई का चार्ट */
+        .chart-section { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+        .section-title { font-size: 14px; font-weight: bold; color: #9d4edd; margin-bottom: 12px; text-transform: uppercase; }
+        .chart-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1c1c1c; font-size: 14px; }
+        .chart-row:last-child { border-bottom: none; }
+        .reward-amt { color: #10b981; font-weight: bold; }
+
+        /* 🎁 क्लेम बोनस लिस्ट */
+        .claim-list { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 16px; }
+        .friend-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1c1c1c; }
+        .friend-row:last-child { border-bottom: none; }
+        .friend-info { font-size: 14px; font-weight: 500; }
+        .friend-status { font-size: 11px; color: #aaa; margin-top: 2px; }
+        .claim-now-btn { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .claim-now-btn.claimed { background: #1c1c1c; border: 1px solid #334155; color: #666; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <!-- 🔙 यूनिवर्सल टॉप नेविगेशन -->
+    <div class="top-nav">
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'">←</span>
+        <div class="page-title">Refer & Earn</div>
+    </div>
+
+    <!-- 🎫 इनवाइट कोड कार्ड -->
+    <div class="invite-card">
+        <div class="card-txt">Your Referral Code</div>
+        <div class="code-row">
+            <span class="invite-code" id="my-invite-code">LOADING...</span>
+            <button class="copy-btn" onclick="copyInviteCode()">Copy</button>
+        </div>
+        
+        <!-- 📢 सोशल शेयर ग्रिड -->
+        <div class="share-grid">
+            <button class="share-btn btn-wa" onclick="shareToSocial('whatsapp')"><span class="share-icon">💬</span>WhatsApp</button>
+            <button class="share-btn btn-tg" onclick="shareToSocial('telegram')"><span class="share-icon">✈️</span>Telegram</button>
+            <button class="share-btn btn-ig" onclick="shareToSocial('instagram')"><span class="share-icon">📸</span>Instagram</button>
+        </div>
+    </div>
+
+    <!-- 📊 कमाई का चार्ट -->
+    <div class="chart-section">
+        <div class="section-title">💰 Referral Reward Chart</div>
+        <div class="chart-row"><span>👤 Friend Sign-Up (Instant)</span><span class="reward-amt">+ ₹5.00</span></div>
+        <div class="chart-row"><span>💳 Friend First Token Deposit</span><span class="reward-amt">+ ₹30.00</span></div>
+    </div>
+
+    <!-- 🎁 क्लेम बोनस लिस्ट -->
+    <div class="claim-section">
+        <div class="section-title">🎁 Claim Extra Milestone Bonus</div>
+        <div class="claim-list" id="friends-container">
+            <!-- डमी लाइव सिंक फ्रेंड्स डेटा यहाँ लोड होगा -->
+            <div class="friend-row">
+                <div class="friend-info"><div>Rahul Kumar (9876xxxxxx)</div><div class="friend-status" style="color:#10b981;">First Deposit Completed</div></div>
+                <button class="claim-now-btn" onclick="claimBonus(this, 'Rahul Kumar', 30)">Claim ₹30</button>
+            </div>
+            <div class="friend-row">
+                <div class="friend-info"><div>Amit Singh (8765xxxxxx)</div><div class="friend-status">Only Registered</div></div>
+                <button class="claim-now-btn claimed">No Deposit</button>
+            </div>
+        </div>
+    </div>
+
+<!-- जावास्क्रिप्ट भाग 2 में जुड़ेगी -->
+<script>
+    // पेज लोड होते ही लोकल स्टोरेज से यूजर का रेफर कोड सेट करना
+    document.addEventListener("DOMContentLoaded", function() {
+        const inviteCode = localStorage.getItem('user_invite_code') || "CWREF123";
+        document.getElementById('my-invite-code').innerText = inviteCode;
+    });
+
+    // 🎫 इनवाइट कोड कॉपी फंक्शन
+    function copyInviteCode() {
+        const codeText = document.getElementById('my-invite-code').innerText;
+        navigator.clipboard.writeText(codeText);
+        alert("✅ Referral Code Copied Successfully!");
+    }
+
+    // 📢 सोशल मीडिया शेयरिंग फंक्शन (WhatsApp, Telegram, Instagram)
+    function shareToSocial(platform) {
+        const code = document.getElementById('my-invite-code').innerText;
+        // ऐप का डाउनलोड लिंक और मैसेज टेक्स्ट
+        const message = `🔥 Central Wallet ऐप डाउनलोड करें और मेरा इनवाइट कोड यूज़ करें: ${code}\nरजिस्टर करते ही पायें स्पेशल ऑफर्स! डाउनलोड लिंक: https://central-wallet-1.onrender.com`;
+        
+        let url = "";
+        if (platform === 'whatsapp') {
+            url = `https://whatsapp.com{encodeURIComponent(message)}`;
+        } else if (platform === 'telegram') {
+            url = `https://webkit.org{encodeURIComponent('https://central-wallet-1.onrender.com')}&text=${encodeURIComponent(message)}`;
+            // बैकअप अगर डायरेक्ट रीडायरेक्ट काम न करे
+            url = `https://t.me{encodeURIComponent('https://onrender.com')}&text=${encodeURIComponent(message)}`;
+        } else if (platform === 'instagram') {
+            // इंस्टाग्राम पर डायरेक्ट टेक्स्ट शेयरिंग नहीं होती, इसलिए कोड कॉपी करवा के ऐप पर भेजेंगे
+            navigator.clipboard.writeText(message);
+            alert("📋 इनवाइट मैसेज कॉपी हो गया है! इंस्टाग्राम ओपन करके अपने दोस्तों को डीएम (DM) में पेस्ट करें।");
+            window.location.href = "https://instagram.com";
+            return;
+        }
+
+        // नया टैब खोलकर शेयर करना
+        window.open(url, '_blank');
+    }
+
+    // 🎁 बोनस क्लेम करने का लाइव फंक्शन
+    function claimBonus(buttonElement, friendName, amount) {
+        // चेक करें कि बटन पहले से क्लेम तो नहीं है
+        if (buttonElement.classList.contains('claimed')) return;
+
+        const confirmClaim = confirm(`🎁 क्या आप ${friendName} का ₹${amount} फर्स्ट डिपॉजिट बोनस क्लेम करना चाहते हैं?`);
+        
+        if (confirmClaim) {
+            // बटन का रूप बदलना ताकि यूजर दोबारा क्लिक न कर सके (Anti-Double Claim Lock)
+            buttonElement.innerText = "CLAIMED ✓";
+            buttonElement.classList.add('claimed');
+            buttonElement.style.background = "#1c1c1c";
+            buttonElement.style.color = "#666";
+            buttonElement.style.border = "1px solid #334155";
+            buttonElement.disabled = true;
+
+            alert(`🎉 ₹${amount} सफलतापूर्वक क्लेम कर लिया गया है!\nयह राशि आपके सेंट्रल वॉलेट बैलेंस में जोड़ दी गई है।`);
+            
+            // फ्रंटेंड फ्लो के बाद यूजर को वापस होम पेज पर भेजें ताकि नया बैलेंस रिफ्रेश हो सके
+            window.location.href = "dashboard.html";
+        }
+    }
+</script>
+
+</body>
+</html>
