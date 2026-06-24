@@ -1,195 +1,323 @@
 import os
+import random
+import string
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-from bson.objectid import ObjectId
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  #         
 
-# 🔐 मोंगोडीबी कनेक्शन (इसे एक ही लाइन में रखें)
-MONGO_URI = os.getenv("MONGO_URI")
+# ==============================================================================
+#  1.    (DATABASE CONNECTION)
+# ==============================================================================
+DEFAULT_MONGO = "mongodb+srv://arena_user:Arena999@cluster0.pluvfcd.mongodb.net/central_wallet_db?appName=Cluster0"
+MONGO_URI = os.environ.get("MONGO_URI", DEFAULT_MONGO)
 
-client = MongoClient(MONGO_URI)
-db = client['central_wallet_db']
-users_collection = db['users']
-transactions_collection = db['transactions']
-settings_collection = db['gateway_settings']
+try:
+    client = MongoClient(MONGO_URI)
+    db = client['central_wallet_db']
+    
+    users_col = db['users']
+    trans_col = db['transactions']
+    game_sync_col = db['game_sync_requests']
+    admin_col = db['admin_settings']
+    print(" MongoDB Connected Successfully!")
+except Exception as e:
+    print(f" Database Connection Failed: {e}")
 
-@app.route('/')
-def home():
-    return "N&N Network Wallet Gateway Server is Running Live!"
+# Unique UID     (: CW10294)
+def generate_unique_uid():
+    while True:
+        random_num = "".join(random.choices(string.digits, k=5))
+        uid = f"CW{random_num}"
+        if not users_col.find_one({"uid": uid}):
+            return uid
 
-# 👤 1. रजिस्ट्रेशन + 30 N&N साइनअप बोनस + 50 N&N रेफरल बोनस
-@app.route('/api/register', methods=['POST'])
+#      
+def generate_invite_code(first_name):
+    clean_name = "".join(e for e in first_name if e.isalnum()).upper()[:4]
+    random_num = "".join(random.choices(string.digits, k=4))
+    return f"{clean_name}{random_num}"
+
+#    
+@app.route('/api/auth/register', methods=['POST'])
 def register_user():
-    data = request.json
-    name = data.get('name')
-    mobile = data.get('mobile')
-    mpin = data.get('mpin')
-    referred_by = data.get('referred_by')
+    data = request.get_json() or {}
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+    gmail = data.get('gmail', '').strip().lower()
+    mobile = data.get('mobile', '').strip()
+    password = data.get('password', '')
+    confirm_password = data.get('confirm_password', '')
+    invite_code_used = data.get('invite_code', '').strip().upper()
 
-    if not name or not mobile or not mpin:
-        return jsonify({"status": "error", "message": "Fields required!"}), 400
+    if not first_name or not gmail or len(mobile) != 10 or not password:
+        return jsonify({"success": False, "message": "     !"}), 400
 
-    if users_collection.find_one({"mobile": mobile}):
-        return jsonify({"status": "error", "message": "Already registered!"}), 400
+    if password != confirm_password:
+        return jsonify({"success": False, "message": "     !"}), 400
 
-    new_user = {
-        "name": name,
-        "mobile": mobile,
-        "mpin": mpin,
-        "balance": 30.0,
-        "device_id": None,
-        "createdAt": datetime.utcnow()
-    }
-    users_collection.insert_one(new_user)
+    if users_col.find_one({"mobile": mobile}):
+        return jsonify({"success": False, "message": "      !"}), 400
+    if users_col.find_one({"gmail": gmail}):
+        return jsonify({"success": False, "message": " Gmail ID    !"}), 400
 
-    if referred_by and len(referred_by) == 10:
-        referrer = users_collection.find_one({"mobile": referred_by})
-        if referrer:
-            users_collection.update_one({"mobile": referred_by}, {"$inc": {"balance": 50.0}})
-            transactions_collection.insert_one({
-                "sender": "SYSTEM_BONUS",
-                "receiver": referred_by,
-                "amount": 50.0,
-                "type": "referral_reward",
-                "note": f"Invited {name}",
-                "createdAt": datetime.utcnow()
+    promoter_uid = None
+    if invite_code_used:
+        promoter = users_col.find_one({"invite_code": invite_code_used})
+        if promoter:
+            promoter_uid = promoter['uid']
+            users_col.update_one({"uid": promoter_uid}, {"$inc": {"balance": 5.0}})
+            trans_col.insert_one({
+                "uid": promoter_uid, "type": "referral_bonus", "amount": 5.0,
+                "status": "Success", "remark": f"Bonus for inviting {mobile}", "created_at": datetime.utcnow()
             })
 
-    return jsonify({"status": "success", "message": "Registered! 30 Bonus Added."})
+    new_uid = generate_unique_uid()
+    new_invite_code = generate_invite_code(first_name)
+    hashed_password = generate_password_hash(password)
 
-# 🔐 2. लॉगिन लॉजिक
-@app.route('/api/login', methods=['POST'])
+    user_doc = {
+        "uid": new_uid, "first_name": first_name, "last_name": last_name,
+        "gmail": gmail, "mobile": mobile, "password": hashed_password,
+        "mpin": "1234", "balance": 0.0, "invite_code": new_invite_code,
+        "referred_by": promoter_uid, "status": "Active", "shake_to_scan": False, "created_at": datetime.utcnow()
+    }
+    users_col.insert_one(user_doc)
+    return jsonify({"success": True, "message": " !", "uid": new_uid}), 201
+    # ==============================================================================
+#  2.   (3-WAY LOGIN AUTH - UID, MOBILE OR GMAIL)
+# ==============================================================================
+
+@app.route('/api/auth/login', methods=['POST'])
 def login_user():
-    data = request.json
-    mobile = data.get('mobile')
-    mpin = data.get('mpin')
-    
-    user = users_collection.find_one({"mobile": mobile, "mpin": mpin})
+    data = request.get_json() or {}
+    login_key = data.get('login_key', '').strip()
+    password = data.get('password', '')
+
+    if not login_key or not password:
+        return jsonify({"success": False, "message": " -    !"}), 400
+
+    # 3-     (UID, Mobile  Gmail)
+    user = users_col.find_one({
+        "$or": [
+            {"uid": login_key},
+            {"mobile": login_key},
+            {"gmail": login_key.lower()}
+        ]
+    })
+
+    if not user:
+        return jsonify({"success": False, "message": "  !    "}), 404
+
+    if user.get("status") == "Banned":
+        return jsonify({"success": False, "message": "    /Banned    !"}), 403
+
+    #   
+    if check_password_hash(user['password'], password):
+        return jsonify({
+            "success": True,
+            "message": " !",
+            "user": {
+                "uid": user['uid'],
+                "first_name": user['first_name'],
+                "last_name": user['last_name'],
+                "mobile": user['mobile'],
+                "gmail": user['gmail'],
+                "invite_code": user['invite_code'],
+                "shake_to_scan": user.get('shake_to_scan', False)
+            }
+        }), 200
+    else:
+        return jsonify({"success": False, "message": " !    "}), 401
+
+
+# ==============================================================================
+#  3.    (BALANCE & NEW "TO UPI" GAME FEATURE)
+# ==============================================================================
+
+# (A)    (To Mobile / UID Search )
+@app.route('/api/wallet/search-user', methods=['POST'])
+def search_user():
+    data = request.get_json() or {}
+    search_query = data.get('query', '').strip()
+
+    user = users_col.find_one({
+        "$or": [
+            {"uid": search_query},
+            {"mobile": search_query}
+        ]
+    })
+
     if user:
         return jsonify({
-            "status": "success",
-            "message": "Welcome!",
-            "user": {
-                "userId": str(user['_id']),
-                "name": user['name'],
-                "mobile": user['mobile'],
-                "balance": user.get('balance', 30.0)
-            }
-        })
-    return jsonify({"status": "error", "message": "Invalid Login!"}), 401
+            "success": True, 
+            "user_found": True, 
+            "name": f"{user['first_name']} {user['last_name']}",
+            "uid": user['uid']
+        }), 200
+    else:
+        return jsonify({
+            "success": False, 
+            "user_found": False, 
+            "message": "Central Wallet     UID     "
+        }), 200
 
-# 🔄 3. वॉलेट-टू-वॉलेट ट्रांसफर (P2P Transfer)
-@app.route('/api/transfer', methods=['POST'])
-def transfer_coins():
-    data = request.json
-    sender_mobile = data.get('sender_mobile')
-    receiver_mobile = data.get('receiver_mobile')
+# (B)     (Check Balance with MPIN Lock)
+@app.route('/api/wallet/check-balance', methods=['POST'])
+def check_balance():
+    data = request.get_json() or {}
+    uid = data.get('uid', '').strip()
+    mpin = data.get('mpin', '').strip()
+
+    user = users_col.find_one({"uid": uid})
+    if not user:
+        return jsonify({"success": False, "message": "  !"}), 404
+
+    if user.get('mpin') == mpin:
+        return jsonify({"success": True, "balance": float(user.get('balance', 0.0))}), 200
+    else:
+        return jsonify({"success": False, "message": "  MPIN!     "}), 401
+
+# (C)   : "To UPI"  (      UPI    )
+@app.route('/api/wallet/pay-to-upi', methods=['POST'])
+def pay_to_upi():
+    data = request.get_json() or {}
+    sender_uid = data.get('sender_uid', '').strip()
+    game_upi_id = data.get('game_upi_id', '').strip()
+    mpin = data.get('mpin', '').strip()
+
+    sender = users_col.find_one({"uid": sender_uid})
+    if not sender:
+        return jsonify({"success": False, "message": "     !"}), 404
+
+    if sender.get('mpin') != mpin:
+        return jsonify({"success": False, "message": " MPIN!  "}), 401
+
+    #      UPI         
+    sync_req = game_sync_col.find_one({"game_upi_id": game_upi_id, "status": "Pending"})
+    if not sync_req:
+        return jsonify({"success": False, "message": " UPI           !"}), 400
+
+    amount_to_pay = float(sync_req['amount'])
+
+    if float(sender.get('balance', 0.0)) < amount_to_pay:
+        return jsonify({"success": False, "message": "     !"}), 400
+
+    # 1.       
+    users_col.update_one({"uid": sender_uid}, {"$inc": {"balance": -amount_to_pay}})
+
+    # 2.     'Success'  
+    game_sync_col.update_one({"game_upi_id": game_upi_id}, {
+        "$set": {
+            "status": "Success",
+            "paid_by_uid": sender_uid,
+            "updated_at": datetime.utcnow()
+        }
+    })
+
+    # 3.      
+    trans_col.insert_one({
+        "uid": sender_uid, "type": "Game_Deposit_Via_UPI", "amount": amount_to_pay,
+        "status": "Success", "remark": f"Sent to game ID {sync_req.get('game_id')}", "created_at": datetime.utcnow()
+    })
+
+    return jsonify({"success": True, "message": f" {amount_to_pay}  !"}), 200
+    # ==============================================================================
+#  4.     (DYNAMIC RANDOM QR & UPI GENERATOR ROUTE)
+# ==============================================================================
+#        ,           
+@app.route('/api/game/generate-request', methods=['POST'])
+def generate_game_request():
+    data = request.get_json() or {}
+    game_id = data.get('game_id', '').strip()
     amount = float(data.get('amount', 0))
-    
-    if amount <= 0:
-        return jsonify({"status": "error", "message": "Invalid Amount!"}), 400
-        
-    sender = users_collection.find_one({"mobile": sender_mobile})
-    receiver = users_collection.find_one({"mobile": receiver_mobile})
-    
-    if not sender or not receiver:
-        return jsonify({"status": "error", "message": "User not found!"}), 404
-        
-    if sender.get('balance', 30.0) < amount:
-        return jsonify({"status": "error", "message": "Insufficient Balance!"}), 400
 
-    users_collection.update_one({"mobile": sender_mobile}, {"$inc": {"balance": -amount}})
-    users_collection.update_one({"mobile": receiver_mobile}, {"$inc": {"balance": amount}})
+    if not game_id or amount <= 0:
+        return jsonify({"success": False, "message": "    !"}), 400
 
-    transactions_collection.insert_one({
-        "sender": sender_mobile,
-        "receiver": receiver_mobile,
+    #  6-      UPI   
+    random_token = "".join(random.choices(string.digits, k=6))
+    generated_upi = f"pay-game-{random_token}@cw"
+
+    #          
+    sync_doc = {
+        "game_id": game_id,
         "amount": amount,
-        "type": "wallet_transfer",
-        "createdAt": datetime.utcnow()
-    })
-    return jsonify({"status": "success", "message": "Coins transferred!"})
-
-# 📥 4. बैंक क्यूआर से टोकन ऐड करना (Add Tokens Request)
-@app.route('/api/wallet/add-tokens', methods=['POST'])
-def add_tokens():
-    data = request.json
-    user_id = data.get('userId')
-    utr_number = data.get('utrNumber')
-    amount = data.get('amount')
-
-    if transactions_collection.find_one({"utrNumber": utr_number}):
-        return jsonify({"success": False, "message": "UTR already used!"}), 400
-
-    transactions_collection.insert_one({
-        "userId": ObjectId(user_id),
-        "utrNumber": utr_number,
-        "amount": float(amount),
+        "game_upi_id": generated_upi,
         "status": "Pending",
-        "createdAt": datetime.utcnow()
-    })
-    return jsonify({"success": True, "message": "UTR submitted!"})
+        "created_at": datetime.utcnow()
+    }
+    game_sync_col.insert_one(sync_doc)
 
-# 🛠️ 5. CPANEL / ADMIN LOGIC
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "Parveen123"
-
-if not settings_collection.find_one({"type": "global_config"}):
-    settings_collection.insert_one({"type": "global_config", "transfer_fee_percent": 3.0, "ads_enabled": True})
-
-@app.route('/api/admin/login', methods=['POST'])
-def admin_login():
-    data = request.json
-    if data.get('username') == ADMIN_USERNAME and data.get('password') == ADMIN_PASSWORD:
-        return jsonify({"success": True, "token": "ADMIN_TOKEN"})
-    return jsonify({"success": False, "message": "Wrong credentials!"}), 401
-
-@app.route('/api/admin/dashboard-stats', methods=['GET'])
-def get_stats():
-    total_users = users_collection.count_documents({})
-    pending_utr = transactions_collection.count_documents({"status": "Pending"})
-    config = settings_collection.find_one({"type": "global_config"}) or {}
     return jsonify({
-        "success": True, 
-        "totalUsers": total_users, 
-        "pendingUtrCount": pending_utr,
-        "currentFee": config.get('transfer_fee_percent', 3.0), 
-        "adsStatus": config.get('ads_enabled', True)
-    })
+        "success": True,
+        "game_upi_id": generated_upi,
+        "qr_data_string": f"upi://pay?pa={generated_upi}&am={amount}&tn=GameLoad"
+    }), 200
 
-@app.route('/api/admin/pending-utr', methods=['GET'])
-def get_pending_utr():
-    pending_txns = list(transactions_collection.find({"status": "Pending"}))
-    output = [{"_id": str(txn['_id']), "userId": str(txn['userId']), "utrNumber": txn['utrNumber'], "amount": txn['amount']} for txn in pending_txns]
-    return jsonify({"success": True, "transactions": output})
+# ==============================================================================
+#  5.   (ADVANCED MANAGEMENT & LIVE STATISTICS VIEW)
+# ==============================================================================
 
-@app.route('/api/admin/process-utr', methods=['POST'])
-def process_utr():
-    data = request.json
-    txn_id, status = data.get('txnId'), data.get('status')
-    txn = transactions_collection.find_one({"_id": ObjectId(txn_id), "status": "Pending"})
-    if not txn:
-        return jsonify({"success": False, "message": "Not found!"})
-    if status == "Success":
-        users_collection.update_one({"_id": txn['userId']}, {"$inc": {"balance": float(txn['amount'])}})
-    transactions_collection.update_one({"_id": ObjectId(txn_id)}, {"$set": {"status": status}})
-    return jsonify({"success": True, "message": "Processed successfully!"})
+#     (       )
+@app.route('/api/admin/dashboard', methods=['POST'])
+def get_admin_dashboard():
+    data = request.get_json() or {}
+    admin_user = data.get('username', '')
+    admin_pass = data.get('password', '')
 
-@app.route('/api/admin/control-user', methods=['POST'])
-def control_user():
-    data = request.json
-    mobile, action, amount = data.get('mobileNumber'), data.get('action'), float(data.get('amount', 0))
-    if action == 'gift':
-        users_collection.update_one({"mobile": mobile}, {"$inc": {"balance": amount}})
-        return jsonify({"success": True, "message": "Gift credited!"})
-    elif action == 'unlock_device':
-        users_collection.update_one({"mobile": mobile}, {"$set": {"device_id": None}})
-        return jsonify({"success": True, "message": "Device unlocked!"})
-    return jsonify({"success": False, "message": "Invalid action"}), 400
+    #       
+    if admin_user != "admin" or admin_pass != "Parveen999":
+        return jsonify({"success": False, "message": " !   "}), 401
+
+    #   (Live Information Calculations)
+    total_users_count = users_col.count_documents({})
+    
+    #     
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    new_accounts_today = users_col.count_documents({"created_at": {"$gte": today_start}})
+
+    #         (Pipelining)
+    pipeline_dep = [{"$match": {"type": "add_money", "status": "Success"}}, {"$group": {"_id": None, "total": {"$sum": "$amount"}}}]
+    pipeline_wit = [{"$match": {"type": "withdrawal", "status": "Success"}}, {"$group": {"_id": None, "total": {"$sum": "$amount"}}}]
+    
+    total_deposit = list(trans_col.aggregate(pipeline_dep))
+    total_withdraw = list(trans_col.aggregate(pipeline_wit))
+
+    dep_sum = total_deposit[0]['total'] if total_deposit else 0.0
+    wit_sum = total_withdraw[0]['total'] if total_withdraw else 0.0
+
+    #           
+    raw_users_list = []
+    all_users = users_col.find({}, {"_id": 0, "uid": 1, "mobile": 1, "gmail": 1, "first_name": 1, "last_name": 1, "balance": 1, "status": 1})
+    for u in all_users:
+        raw_users_list.append({
+            "uid": u.get("uid"),
+            "name": f"{u.get('first_name')} {u.get('last_name')}",
+            "mobile": u.get("mobile"),
+            "gmail": u.get("gmail"),
+            "balance": u.get("balance", 0.0),
+            "status": u.get("status", "Active"),
+            "password_hash_hidden": " Protected By Encryption"
+        })
+
+    return jsonify({
+        "success": True,
+        "statistics": {
+            "total_users": total_users_count,
+            "new_users_today": new_accounts_today,
+            "total_deposited_money": dep_sum,
+            "total_withdrawn_money": wit_sum
+        },
+        "users_data_table": raw_users_list
+    }), 200
 
 if __name__ == '__main__':
-    app.run()
+    #           
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+    

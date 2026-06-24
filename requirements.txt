@@ -1,7 +1,4 @@
-flask
-flask-cors
-pymongo[srv]
-gunicorn
-
-dnspython
-certifi
+flask==3.0.2
+flask-cors==4.0.0
+pymongo[srv]==4.6.2
+werkzeug==3.0.1
