@@ -358,6 +358,48 @@ def generate_game_deposit_qr():
         # यह स्ट्रिंग सीधे सेंट्रल वॉलेट ऐप का स्कैनर पहचान लेगा
         "qr_data_string": f"centralwallet://pay?upi={generated_game_upi}&amount=${amount}&game_id=${game_id}"
     }), 200
+    # ==============================================================================
+# 🎮 GAME MODULE PART 2: RECEIVE TOKENS BACK FROM GAME (WITHDRAWAL TO WALLET)
+# ==============================================================================
+
+@app.route('/api/game/execute-withdrawal', methods=['POST'])
+def execute_game_withdrawal():
+    data = request.get_json() or {}
+    player_mobile = data.get('user_mobile', '').strip()  # खिलाड़ी का मोबाइल नंबर
+    amount = data.get('amount')
+
+    if not player_mobile or not amount:
+        return jsonify({"success": False, "message": "मोबाइल नंबर और राशि भरना अनिवार्य है!"}), 400
+
+    try:
+        amount = float(amount)
+        if amount <= 0:
+            return jsonify({"success": False, "message": "विड्रॉल राशि शून्य से अधिक होनी चाहिए!"}), 400
+    except ValueError:
+        return jsonify({"success": False, "message": "राशि केवल अंकों में होनी चाहिए!"}), 400
+
+    # 🔍 चेक करें कि क्या खिलाड़ी का अकाउंट हमारे सेंट्रल वॉलेट में रजिस्टर्ड है
+    user = users_col.find_one({"mobile": player_mobile})
+    if not user:
+        return jsonify({"success": False, "message": "इस मोबाइल नंबर पर कोई सेंट्रल वॉलेट अकाउंट नहीं मिला!"}), 404
+
+    # 💰 सुरक्षा चक्र: गेम से टोकन काटकर सेंट्रल वॉलेट बैलेंस में तुरंत जोड़ना (Instant Sync)
+    users_col.update_one({"mobile": player_mobile}, {"$inc": {"balance": amount}})
+
+    # 📜 वॉलेट की पासबुक हिस्ट्री (History) में इसकी लाइव एंट्री दर्ज करना
+    trans_col.insert_one({
+        "uid": user['uid'],
+        "type": "add_money",  # वॉलेट के लिए यह पैसा आना (Credit) है
+        "amount": amount,
+        "status": "Success",
+        "remark": "Won tokens credited from Arena Game",
+        "created_at": datetime.utcnow()
+    })
+
+    return jsonify({
+        "success": True, 
+        "message": f"🎉 ₹{amount} के टोकन गेम से कटकर आपके सेंट्रल वॉलेट में सफलतापूर्वक जोड़ दिए गए हैं!"
+    }), 200
     
 
 if __name__ == '__main__':
