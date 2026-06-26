@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW - Advanced Profile Hub</title>
+    <style>
+        /* 🎨 प्रीमियम मोबाइल डार्क थीम डिजाइन */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #111827; color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 450px; background: #1f2937; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; position: relative; }
+        
+        /* 🔙 बैक बटन */
+        .header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #374151; background: #111827; margin: -20px -20px 15px -20px; padding: 20px; }
+        .back-btn { font-size: 24px; cursor: pointer; text-decoration: none; color: #3b82f6; font-weight: bold; }
+        .header h1 { font-size: 18px; font-weight: bold; color: #e5e7eb; }
+
+        /* 👤 मुख्य प्रोफाइल सेक्शन */
+        .profile-main-box { background: #263238; border-radius: 12px; padding: 15px; border: 1px solid #374151; display: flex; align-items: center; gap: 15px; }
+        .avatar-logo { width: 55px; height: 55px; background: #2563eb; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 22px; border: 2px solid white; flex-shrink: 0; }
+        .user-info-cols { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        .u-name { font-size: 17px; font-weight: bold; color: white; }
+        .u-uid { font-size: 12px; color: #9ca3af; }
+        .edit-action-btn { background: #374151; border: none; color: #3b82f6; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: fit-content; margin-top: 2px; }
+
+        /* 🔳 क्यूआर कोड और यूपीआई कॉपी रो (UPI Copy Row) */
+        .qr-card-section { background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #374151; text-align: center; margin-top: 5px; }
+        .upi-copy-row { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 15px; background: #1f2937; padding: 8px 12px; border-radius: 8px; border: 1px dashed #4b5563; }
+        .upi-id-badge { font-size: 13px; color: #34d399; font-weight: bold; font-family: monospace; }
+        .copy-btn { background: #3b82f6; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .copy-btn:hover { background: #2563eb; }
+        
+        .qr-box-white { background: white; padding: 12px; border-radius: 12px; width: 160px; height: 160px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 3px solid #2563eb; }
+        .qr-pattern { width: 100%; height: 100%; background: radial-gradient(circle, #000 25%, transparent 25%), radial-gradient(circle, #000 25%, transparent 25%); background-size: 8px 8px; background-position: 0 0, 4px 4px; border-radius: 4px; opacity: 0.8; }
+
+        /* ⚙️ लिस्ट स्विचेस */
+        .list-options-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .option-item-row { background: #263238; padding: 14px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; border: 1px solid #374151; }
+        .option-item-row.clickable { cursor: pointer; }
+        .option-item-row.clickable:hover { background: #374151; }
+        
+        /* टॉगल स्विच */
+        .switch-toggle { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch-toggle input { opacity: 0; width: 0; height: 0; }
+        .slider-round { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: .3s; border-radius: 22px; }
+        .slider-round:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider-round { background-color: #10b981; }
+        input:checked + .slider-round:before { transform: translateX(22px); }
+
+        /* 🔒 नाम एडिट पॉप-अप */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 17, 27, 0.96); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-card { background: #1f2937; width: 90%; max-width: 380px; padding: 25px; border-radius: 16px; border: 1px solid #374151; }
+        .modal-card h2 { font-size: 18px; color: #3b82f6; margin-bottom: 15px; text-align: center; }
+        .modal-card input { width: 100%; padding: 11px; margin-bottom: 14px; border-radius: 8px; border: 1px solid #4b5563; background: #374151; color: white; font-size: 14px; outline: none; }
+        .modal-btn-row { display: flex; gap: 10px; margin-top: 5px; }
+        .m-btn { flex: 1; padding: 11px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; color: white; }
+        .m-btn-save { background: #10b981; }
+        .m-btn-cancel { background: #4b5563; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 🔙 हेडर -->
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">⬅</a>
+            <h1>User Profile Settings</h1>
+        </div>
+                <!-- 👤 मुख्य प्रोफाइल सेक्शन -->
+        <div class="profile-main-box">
+            <div class="avatar-logo" id="avatar-char">P</div>
+            <div class="user-info-cols">
+                <span class="u-name" id="display-full-name">Parveen Kumar</span>
+                <span class="u-uid">UID: <span style="color:#60a5fa" id="display-uid">CW1001</span></span>
+                <button class="edit-action-btn" onclick="openEditProfileModal()">Edit Profile</button>
+            </div>
+        </div>
+
+        <!-- 🔳 क्यूआर कोड और यूपीआई कॉपी रो (Unique QR & UPI Copy Row) -->
+        <div class="qr-card-section">
+            <div class="upi-copy-row">
+                <!-- यूजर की लाइव UPI आईडी -->
+                <span class="upi-id-badge" id="display-upi-id">cw1001@centralwallet</span>
+                <!-- यह रहा आपका कॉपी बटन -->
+                <button class="copy-btn" onclick="copyUserUpiId()">📋 Copy</button>
+            </div>
+            
+            <div class="qr-box-white">
+                <!-- सर्वर लाइव होने पर यहाँ ऑटोमैटिक असली QR कोड इमेज बनकर लोड होगी -->
+                <div class="qr-pattern" id="live-qr-target"></div>
+            </div>
+            <p style="font-size: 11px; color: #9ca3af; margin-top: 8px;">Scan this QR to receive alpha coins instantly</p>
+        </div>
+
+        <!-- ⚙️ मास्टर ऑप्शंस लिस्ट -->
+        <div class="list-options-group">
+            
+            <!-- शेक सेंसर स्विच -->
+            <div class="option-item-row">
+                <span>👋 Shake to Scan Camera</span>
+                <label class="switch-toggle">
+                    <input type="checkbox" id="shake-sensor-switch" onchange="toggleShakeSensorState(this)">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+
+            <!-- पर्सनल बूस्ट -->
+            <div class="option-item-row">
+                <span>🚀 Personal Boost Rewards</span>
+                <span style="color: #a855f7; font-size: 12px; font-weight: bold; background: #3b0764; padding: 3px 8px; border-radius: 4px;">Coming Soon</span>
+            </div>
+
+            <!-- सीधा नया सुरक्षा MPIN बनाने का विकल्प (बिना पुराना पिन मांगे) -->
+            <div class="option-item-row clickable" onclick="handleDirectNewMpin()">
+                <span>🔐 Change Security MPIN</span>
+                <span style="color: #3b82f6; font-size: 12px; font-weight: bold;">New PIN ➔</span>
+            </div>
+
+            <!-- लॉगआउट बटन -->
+            <div class="option-item-row clickable" onclick="triggerAppLogout()" style="background: #7f1d1d; border-color: #991b1b;">
+                <span style="color: #fca5a5; font-weight: bold;">🚪 Logout From Account</span>
+                <span style="color: #fca5a5;">➔</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🔒 नाम बदलने का पॉप-अप -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-card">
+            <h2>प्रोफाइल संपादित करें</h2>
+            <form onsubmit="saveProfileNewData(event)">
+                <label style="font-size:12px; color:#9ca3af; display:block; margin-bottom:5px;">फर्स्ट नाम</label>
+                <input type="text" id="input-first-name" value="Parveen" required>
+                
+                <label style="font-size:12px; color:#9ca3af; display:block; margin-bottom:5px;">लास्ट नाम</label>
+                <input type="text" id="input-last-name" value="Kumar" required>
+                
+                <div class="modal-btn-row">
+                    <button type="button" class="m-btn m-btn-cancel" onclick="closeEditProfileModal()">Cancel</button>
+                    <button type="submit" class="m-btn m-btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+        <!-- 💻 एडवांस इंटरैक्टिव स्क्रिप्ट लॉजिक -->
+    <script>
+        // 1. UPI आईडी कॉपी करने का नया फंक्शन
+        function copyUserUpiId() {
+            const upiId = document.getElementById('display-upi-id').innerText;
+            
+            // क्लिपबोर्ड पर लाइव कॉपी करने का कोड
+            navigator.clipboard.writeText(upiId).then(() => {
+                alert("✓ UPI ID सफलतापूर्वक कॉपी हो गई है! इसे कहीं भी शेयर करें।");
+            }).catch(() => {
+                alert("कॉपी फेल! कृपया मैन्युअल रूप से कॉपी करें।");
+            });
+        }
+
+        // 2. नाम एडिट पॉप-अप कंट्रोल
+        function openEditProfileModal() { document.getElementById('editProfileModal').classList.add('open'); }
+        function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('open'); }
+
+        function saveProfileNewData(e) {
+            e.preventDefault();
+            const first = document.getElementById('input-first-name').value.trim();
+            const last = document.getElementById('input-last-name').value.trim();
+            
+            if (first && last) {
+                document.getElementById('display-full-name').innerText = `${first} ${last}`;
+                document.getElementById('avatar-char').innerText = first.substring(0,1).toUpperCase();
+                closeEditProfileModal();
+                alert("प्रोफाइल बदल गई है! पेज ऑटो रीलोड हो रहा है...");
+                location.reload();
+            }
+        }
+
+        // 3. सीधा नया MPIN बनाने का विकल्प (बिना पुराना पिन मांगे)
+        function handleDirectNewMpin() {
+            const newPin = prompt("नया 4-डिजिट सुरक्षा MPIN (New PIN) दर्ज करें:");
+            
+            if (newPin !== null) {
+                if (newPin.trim().length === 4 && !isNaN(newPin)) {
+                    alert("✓ बधाई हो! आपका नया सुरक्षा MPIN सफलतापूर्वक सेट कर दिया गया है।");
+                } else {
+                    alert("❌ त्रुटि: सुरक्षा पिन केवल 4 अंकों की संख्या होनी चाहिए!");
+                }
+            }
+        }
+
+        // 4. शेक सेंसर ऑन/ऑफ स्विच कंट्रोल
+        let isShakeEnabled = false;
+        function toggleShakeSensorState(checkbox) {
+            isShakeEnabled = checkbox.checked;
+            if (isShakeEnabled) alert("📱 SENSOR ON: फोन हिलाते ही कैमरा स्कैनर चालू हो जाएगा।");
+            else alert("❌ SENSOR OFF: शेक सेंसर बंद कर दिया गया है।");
+        }
+
+        let lastX, lastY, lastZ;
+        window.addEventListener('devicemotion', function(event) {
+            if (!isShakeEnabled) return;
+            let acceleration = event.accelerationIncludingGravity;
+            if (!acceleration) return;
+
+            let currentX = acceleration.x;
+            let currentY = acceleration.y;
+            let currentZ = acceleration.z;
+
+            if (lastX !== undefined) {
+                let changeX = Math.abs(currentX - lastX);
+                let changeY = Math.abs(currentY - lastY);
+                let changeZ = Math.abs(currentZ - lastZ);
+
+                if (changeX + changeY + changeZ > 26) {
+                    isShakeEnabled = false;
+                    document.getElementById('shake-sensor-switch').checked = false;
+                    alert("📷 SHAKE SUCCESS: फोन शेक डिटेक्ट हुआ! कैमरा स्कैनर चालू हो रहा है... 📷");
+                }
+            }
+            lastX = currentX; lastY = currentY; lastZ = currentZ;
+        });
+
+        // 5. लॉगआउट एक्शन
+        function triggerAppLogout() {
+            if (confirm("क्या आप सच में लॉगआउट होना चाहते हैं?")) {
+                alert("लॉगआउट सफल! ऑथेंटिकेशन पेज पर भेजा जा रहा है...");
+                window.location.href = 'auth.html';
+            }
+        }
+    </script>
+</body>
+</html>

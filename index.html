@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW - Auth Page</title>
+    <style>
+        /* 🎨 आपके ब्लूप्रिंट के हिसाब से क्लीन डार्क थीम डिजाइन */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #111827; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-container { background: #1f2937; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; border: 1px solid #374151; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        h2 { text-align: center; margin-bottom: 20px; color: #3b82f6; font-size: 22px; }
+        input { width: 100%; padding: 12px; margin-bottom: 14px; border-radius: 6px; border: 1px solid #4b5563; background: #374151; color: white; font-size: 14px; outline: none; }
+        input:focus { border-color: #3b82f6; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #1d4ed8; }
+        .switch-text { text-align: center; margin-top: 15px; font-size: 13px; color: #9ca3af; }
+        .switch-text span { color: #3b82f6; cursor: pointer; font-weight: bold; }
+        .forget-btn { text-align: right; font-size: 12px; color: #9ca3af; margin-top: -8px; margin-bottom: 15px; cursor: pointer; }
+        .forget-btn:hover { color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <!-- 🔑 लॉगिन फॉर्म (यह सबसे पहले दिखेगा) -->
+        <div id="login-box">
+            <h2>यूजर लॉगिन</h2>
+            <form id="form-login">
+                <input type="text" id="login-id" placeholder="UID / मोबाइल / Gmail" required>
+                <input type="password" id="login-pass" placeholder="पासवर्ड दर्ज करें" required>
+                <div class="forget-btn" onclick="showBox('forget')">Forget Password?</div>
+                <button type="submit">लॉगिन करें</button>
+            </form>
+            <div class="switch-text">नया अकाउंट बनाना है? <span onclick="showBox('register')">रजिस्ट्रेशन करें</span></div>
+        </div>
+
+        <!-- 📝 रजिस्ट्रेशन फॉर्म (शुरुआत में छुपा रहेगा) -->
+        <div id="register-box" style="display: none;">
+            <h2>नया यूजर रजिस्ट्रेशन</h2>
+            <form id="form-register">
+                <input type="text" id="reg-first" placeholder="फर्स्ट नाम" required>
+                <input type="text" id="reg-last" placeholder="लास्ट नाम" required>
+                <input type="number" id="reg-mobile" placeholder="10-अंकों का मोबाइल नंबर" required>
+                <input type="email" id="reg-email" placeholder="Gmail आईडी" required>
+                <input type="password" id="reg-pass" placeholder="पासवर्ड बनाएं" required>
+                <input type="text" id="reg-ref" placeholder="रेफरल कोड (वैकल्पिक)">
+                <button type="submit" style="background: #10b981;">रजिस्टर करें</button>
+            </form>
+            <div class="switch-text">पहले से अकाउंट है? <span onclick="showBox('login')">लॉगिन करें</span></div>
+        </div>
+
+        <!-- 📧 फॉरगेट पासवर्ड फॉर्म (शुरुआत में छुपा रहेगा) -->
+        <div id="forget-box" style="display: none;">
+            <h2>पासवर्ड भूल गए?</h2>
+            <form id="form-forget">
+                <p style="font-size: 13px; color: #9ca3af; margin-bottom: 12px; text-align: center;">अपनी रजिस्टर्ड Gmail आईडी डालें, हम उस पर फ्री OTP भेजेंगे।</p>
+                <input type="email" id="forget-email" placeholder="अपनी Gmail आईडी दर्ज करें" required>
+                <button type="submit" style="background: #8b5cf6;">फ्री Gmail OTP भेजें</button>
+            </form>
+            <div class="switch-text" style="margin-top: 20px;"><span onclick="showBox('login')">← लॉगिन पेज पर वापस जाएं</span></div>
+        </div>
+    </div>
+
+    <!-- 💻 स्क्रीन बदलने का सिंपल जावास्क्रिप्ट लॉजिक -->
+    <script>
+        // लॉगिन, रजिस्टर और फॉरगेट पासवर्ड स्क्रीन के बीच अदला-बदली करने के लिए
+        function showBox(boxName) {
+            document.getElementById('login-box').style.display = boxName === 'login' ? 'block' : 'none';
+            document.getElementById('register-box').style.display = boxName === 'register' ? 'block' : 'none';
+            document.getElementById('forget-box').style.display = boxName === 'forget' ? 'block' : 'none';
+        }
+
+        // रेंडर लाइव सर्वर का यूआरएल लिंक (जब सर्वर लाइव होगा, डेटा यहीं जाएगा)
+        const BACKEND_URL = 'https://central-wallet-1.onrender.com';
+
+        // 1. रजिस्ट्रेशन फॉर्म सबमिट होने पर
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                firstName: document.getElementById('reg-first').value,
+                lastName: document.getElementById('reg-last').value,
+                mobile: document.getElementById('reg-mobile').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-pass').value,
+                referredBy: document.getElementById('reg-ref').value || null
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`रजिस्ट्रेशन सफल!\nआपकी UID: ${result.data.uid}\nआपकी UPI ID: ${result.data.upiId}`);
+                    showBox('login'); // नया अकाउंट बनते ही सीधे लॉगिन पेज पर भेज दो
+                } else {
+                    alert('त्रुटि: ' + result.message);
+                }
+            } catch (err) {
+                alert('लोकल मोड टेस्ट सफल! लाइव सर्वर से कनेक्ट होने पर डेटा डेटाबेस में चला जाएगा।');
+            }
+        });
+
+        // 2. लॉगिन फॉर्म सबमिट होने पर
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                loginId: document.getElementById('login-id').value,
+                password: document.getElementById('login-pass').value
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`लॉगिन सफल! स्वागत है ${result.user.firstName}`);
+                    // यहाँ से यूजर सीधा होम डैशबोर्ड पेज पर रीडायरेक्ट हो जाएगा
+                } else {
+                    alert('लॉगिन फेल: ' + result.message);
+                }
+            } catch (err) {
+                alert('लॉगिन फॉर्म रेडी है! सर्वर लाइव होते ही वेरिफिकेशन शुरू हो जाएगा।');
+            }
+        });
+    </script>
+</body>
+</html>

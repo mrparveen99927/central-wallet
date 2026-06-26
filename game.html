@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW - Play Games</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #111827; color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 450px; background: #1f2937; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* 🔙 हेडर */
+        .header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #374151; background: #111827; margin: -20px -20px 15px -20px; padding: 20px; }
+        .back-btn { font-size: 24px; cursor: pointer; text-decoration: none; color: #3b82f6; font-weight: bold; }
+        .header h1 { font-size: 18px; font-weight: bold; color: #e5e7eb; }
+
+        /* 🎮 गेम बॉक्सेस ग्रिड (2 कॉलम में सेट) */
+        .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 5px; }
+        
+        .game-card-box { background: #263238; border-radius: 14px; padding: 25px 15px; text-align: center; border: 1px dashed #4b5563; display: flex; flex-direction: column; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: 0.2s; position: relative; overflow: hidden; }
+        .game-card-box:hover { border-color: #a855f7; background: #111827; }
+        
+        .g-icon { font-size: 32px; filter: grayscale(40%); }
+        .g-title { font-size: 14px; font-weight: bold; color: #e5e7eb; }
+        
+        /* 🌟 कमिंग सून टैग पट्टी */
+        .coming-soon-badge { font-size: 10px; font-weight: bold; background: #581c87; color: #c084fc; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; border: 1px solid #7e22ce; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">⬅</a>
+            <h1>CW Gaming Zone</h1>
+        </div>
+
+        <!-- 🕹️ आपके कहे अनुसार पूरे 10 सुंदर कमिंग सून डिब्बे -->
+        <div class="games-grid">
+            <div class="game-card-box" onclick="alert('Ludo Game: Coming Soon! 🎲')">
+                <span class="g-icon">🎲</span>
+                <span class="g-title">Ludo King Live</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Color Prediction: Coming Soon! 🎨')">
+                <span class="g-icon">🎨</span>
+                <span class="g-title">Color Predictor</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Aviator: Coming Soon! 🚀')">
+                <span class="g-icon">🚀</span>
+                <span class="g-title">Aviator Fly</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Dragon Tiger: 🐯 Coming Soon!')">
+                <span class="g-icon">🐯</span>
+                <span class="g-title">Dragon vs Tiger</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+                        <div class="game-card-box" onclick="alert('Rummy: Coming Soon! 🃏')">
+                <span class="g-icon">🃏</span>
+                <span class="g-title">Classic Rummy</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Mines: Coming Soon! 💣')">
+                <span class="g-icon">💣</span>
+                <span class="g-title">Mines Sweeper</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('7 Up Down: Coming Soon! 🎰')">
+                <span class="g-icon">🎰</span>
+                <span class="g-title">7 Up Down Roll</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Car Roulette: Coming Soon! 🏎️')">
+                <span class="g-icon">🏎️</span>
+                <span class="g-title">Car Roulette</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Teen Patti: Coming Soon! ♦️')">
+                <span class="g-icon">♦️</span>
+                <span class="g-title">Teen Patti Live</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+            <div class="game-card-box" onclick="alert('Wheel of Fortune: Coming Soon! 🎡')">
+                <span class="g-icon">🎡</span>
+                <span class="g-title">Lucky Wheel</span>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

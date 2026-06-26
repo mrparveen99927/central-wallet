@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW - Official Alerts & Notices</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #111827; color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 450px; background: #1f2937; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; position: relative; overflow-y: auto; }
+        
+        /* 🔙 हेडर और बैक बटन */
+        .header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #374151; background: #111827; margin: -20px -20px 15px -20px; padding: 20px; }
+        .back-btn { font-size: 24px; cursor: pointer; text-decoration: none; color: #3b82f6; font-weight: bold; }
+        .header h1 { font-size: 18px; font-weight: bold; color: #e5e7eb; }
+
+        /* 📢 नोटिस बोर्ड कार्ड डिजाइन */
+        .alert-cards-wrapper { display: flex; flex-direction: column; gap: 12px; }
+        .alert-notice-card { background: #263238; border: 1px solid #374151; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .alert-notice-card.urgent { border-left-color: #ef4444; background: linear-gradient(to right, #2d1616, #263238); }
+        .alert-notice-card.offer { border-left-color: #10b981; }
+
+        .alert-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .alert-tag-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; background: #1e3a8a; color: #93c5fd; }
+        .alert-tag-badge.red-tag { background: #7f1d1d; color: #fca5a5; }
+        .alert-tag-badge.green-tag { background: #064e3b; color: #a7f3d0; }
+
+        .alert-time-lbl { font-size: 11px; color: #9ca3af; font-family: monospace; }
+        .alert-body-text { font-size: 13px; color: #e5e7eb; line-height: 1.5; white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 🔙 बैक करने पर यूजर सीधा डैशबोर्ड पर जाएगा -->
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">⬅</a>
+            <h1>Official Alerts Hub</h1>
+        </div>
+                <div class="alert-cards-wrapper" id="live-notices-container">
+            <!-- नोटिस 1 -->
+            <div class="alert-notice-card urgent">
+                <div class="alert-header-row">
+                    <span class="alert-tag-badge red-tag">🚨 Urgent Notice</span>
+                    <span class="alert-time-lbl">Today | 08:30 PM</span>
+                </div>
+                <div class="alert-body-text">
+                    प्रिय यूजर्स, डिपॉजिट करने के बाद पासबुक में 'Success' स्टेटस आने तक प्रतीक्षा करें। 12-अंकों का UTR नंबर हमेशा सही दर्ज करें, गलत UTR बार-बार सबमिट करने पर आपका अकाउंट हमेशा के लिए बैन किया जा सकता है।
+                </div>
+            </div>
+
+            <!-- नोटिस 2 -->
+            <div class="alert-notice-card">
+                <div class="alert-header-row">
+                    <span class="alert-tag-badge">🎮 Tournament Live</span>
+                    <span class="alert-time-lbl">Today | 12:15 PM</span>
+                </div>
+                <div class="alert-body-text">
+                    🚀 धमाका टूर्नामेंट अपडेट: सेंट्रल वॉलेट मेगा लूडो किंग लीग अब लाइव चालू हो चुकी है! गेम ज़ोन में जाकर अपनी एंट्री रजिस्टर करें और सीधे अपने वॉलेट बैलेंस से कॉइन्स ट्रांसफर करके भाग लें।
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_BASE_API = 'https://central-wallet-1.onrender.com';
+        async function syncLiveCpanelBroadcastNotices() {
+            try {
+                const response = await fetch(`${BACKEND_BASE_API}/api/app/live-config`);
+                const result = await response.json();
+                if (result.success && result.alertNotice) { console.log("Alert synced."); }
+            } catch (error) { console.log("Offline mode."); }
+        }
+        window.addEventListener('DOMContentLoaded', syncLiveCpanelBroadcastNotices);
+    </script>
+</body>
+</html>

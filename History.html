@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CW - Transaction Passbook</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #111827; color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 450px; background: #1f2937; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; position: relative; overflow-y: auto; }
+        
+        /* 🔙 हेडर और बैक बटन */
+        .header { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #374151; background: #111827; margin: -20px -20px 15px -20px; padding: 20px; }
+        .back-btn { font-size: 24px; cursor: pointer; text-decoration: none; color: #3b82f6; font-weight: bold; }
+        .header h1 { font-size: 18px; font-weight: bold; color: #e5e7eb; }
+
+        /* 📜 ट्रांजैक्शन इतिहास लिस्ट */
+        .history-list-wrapper { display: flex; flex-direction: column; gap: 10px; }
+        .txn-item-card { background: #263238; border: 1px solid #374151; padding: 14px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .txn-left-cols { display: flex; align-items: center; gap: 12px; }
+        .txn-icon-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; background: #374151; flex-shrink: 0; }
+        
+        .icon-dep { background: #064e3b; color: #34d399; }
+        .icon-wth { background: #7c2d12; color: #fb923c; }
+
+        .txn-text-info { display: flex; flex-direction: column; gap: 2px; }
+        .txn-title-name { font-size: 14px; font-weight: bold; color: white; }
+        .txn-id-date { font-size: 11px; color: #9ca3af; font-family: monospace; }
+        
+        .txn-right-cols { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .txn-amount-txt { font-size: 16px; font-weight: bold; }
+        .amount-plus { color: #10b981; }
+        .amount-minus { color: #f43f5e; }
+
+        .status-badge { padding: 3px 8px; font-size: 10px; font-weight: bold; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-badge.success { background: #064e3b; color: #a7f3d0; }
+        .status-badge.pending { background: #78350f; color: #fde68a; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 🔙 बैक बटन जो डैशबोर्ड पर ले जाएगा -->
+        <div class="header">
+            <a href="dashboard.html" class="back-btn">⬅</a>
+            <h1>Transaction Passbook</h1>
+        </div>
+                <div class="history-list-wrapper">
+            <!-- कार्ड 1 -->
+            <div class="txn-item-card">
+                <div class="txn-left-cols">
+                    <div class="txn-icon-circle icon-dep">📥</div>
+                    <div class="txn-text-info">
+                        <span class="txn-title-name">Money Deposit (UTR)</span>
+                        <span class="txn-id-date">DEP7F3A2 | Today</span>
+                    </div>
+                </div>
+                <div class="txn-right-cols">
+                    <span class="txn-amount-txt amount-plus">+₹500.00</span>
+                    <span class="status-badge pending">Pending</span>
+                </div>
+            </div>
+
+            <!-- कार्ड 2 -->
+            <div class="txn-item-card">
+                <div class="txn-left-cols">
+                    <div class="txn-icon-circle icon-wth">📤</div>
+                    <div class="txn-text-info">
+                        <span class="txn-title-name">Bank Withdrawal</span>
+                        <span class="txn-id-date">WTH1B8C4 | Yesterday</span>
+                    </div>
+                </div>
+                <div class="txn-right-cols">
+                    <span class="txn-amount-txt amount-minus">-200 Coins</span>
+                    <span class="status-badge success">Success</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_API_URL = 'https://central-wallet-1.onrender.com';
+        async function fetchUserLiveTransactionHistory() {
+            try { await fetch(`${BACKEND_API_URL}/api/app/my-history`); } catch (e) { }
+        }
+        window.addEventListener('DOMContentLoaded', fetchUserLiveTransactionHistory);
+    </script>
+</body>
+</html>
