@@ -19,7 +19,13 @@ const app = express();
 // ==========================================
 // STEP 2:  (Middlewares)
 // ==========================================
-app.use(cors());
+// ❌ पुराने app.use(cors()); को हटाकर यह लिखें:
+app.use(cors({
+  origin: '*', // यह दुनिया की किसी भी वेबसाइट (जैसे GitHub Pages) से डेटा आने की अनुमति देता है
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // ==========================================
