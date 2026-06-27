@@ -635,7 +635,7 @@ app.get('/api/app/live-config', async (req, res) => {
 // ==========================================
 // STEP 7: सर्वर चालू करने का कोड (हमेशा सबसे नीचे)
 // ==========================================
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 सर्वर पोर्ट ${PORT} पर लाइव चल रहा है`);
+    console.log(`Server running on port ${PORT}`);
 });
