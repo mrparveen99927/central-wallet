@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Central Wallet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 20px; padding-bottom: 90px; min-height: 100vh; }
+        
+        /*     */
+        .top-nav { display: flex; align-items: center; margin-bottom: 24px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; margin-right: 15px; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        /*      */
+        .history-container { display: flex; flex-direction: column; gap: 12px; }
+        .history-row { background: #121212; border: 1px solid #1c1c1c; border-radius: 14px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .row-left { display: flex; align-items: center; gap: 12px; }
+        .type-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; }
+        
+        /* -     */
+        .icon-deposit { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .icon-withdraw { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .icon-game { background: rgba(157, 78, 221, 0.15); color: #9d4edd; }
+        
+        .tx-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .tx-date { font-size: 11px; color: #666; }
+        
+        .row-right { text-align: right; }
+        .tx-amount { font-size: 16px; font-weight: 700; }
+        .amt-credit { color: #10b981; }
+        .amt-dedit { color: #ef4444; }
+        .tx-status { font-size: 10px; font-weight: bold; text-transform: uppercase; margin-top: 2px; padding: 1px 5px; border-radius: 4px; display: inline-block; }
+        
+        .status-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+        /*      (5 ) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #0a0a0a; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #888; font-size: 11px; font-weight: 600; cursor: pointer; width: 20%; }
+        .nav-btn.active { color: #9d4edd; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+    <!--     -->
+    <div class="top-nav">
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'"></span>
+        <div class="page-title">Transaction History</div>
+    </div>
+
+    <!--      -->
+    <div class="history-container" id="history-list-box">
+        <!--      (   2  - ) -->
+        <div class="history-row">
+            <div class="row-left">
+                <div class="type-icon icon-deposit"></div>
+                <div><div class="tx-title">Tokens Added via UTR</div><div class="tx-date">Today, 11:20 AM</div></div>
+            </div>
+            <div class="row-right">
+                <div class="tx-amount amt-credit">+ 500.00</div><div class="tx-status status-success">Success</div>
+            </div>
+        </div>
+
+        <div class="history-row">
+            <div class="row-left">
+                <div class="type-icon icon-game"></div>
+                <div><div class="tx-title">Sent to Game UPI</div><div class="tx-date">Yesterday, 09:45 PM</div></div>
+            </div>
+            <div class="row-right">
+                <div class="tx-amount amt-dedit">- 200.00</div><div class="tx-status status-success">Success</div>
+            </div>
+        </div>
+
+        <div class="history-row">
+            <div class="row-left">
+                <div class="type-icon icon-withdraw"></div>
+                <div><div class="tx-title">Bank Cashout Request</div><div class="tx-date">22 Jun 2026, 04:15 PM</div></div>
+            </div>
+            <div class="row-right">
+                <div class="tx-amount amt-dedit">- 1000.00</div><div class="tx-status status-pending">Pending</div>
+            </div>
+        </div>
+    </div>
+
+    <!--      (5  - History Active) -->
+    <div class="bottom-nav">
+        <button class="nav-btn" onclick="window.location.href='dashboard.html'">
+            <span class="nav-icon"></span><span>Home</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='search_feature.html'">
+            <span class="nav-icon"></span><span>Search</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='scan_pay.html'">
+            <span class="nav-icon"></span><span>Scan</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='alerts.html'">
+            <span class="nav-icon"></span><span>Alert</span>
+        </button>
+        <button class="nav-btn active" onclick="window.location.href='history.html'">
+            <span class="nav-icon"></span><span>History</span>
+        </button>
+    </div>
+
+<!--   2   -->
+<script>
+    //     
+    const API_URL = "https://central-wallet-1.onrender.com";
+
+    //         
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchUserTransactionHistory();
+    });
+
+    //       
+    async function fetchUserTransactionHistory() {
+        const userUid = localStorage.getItem('user_uid');
+        const listBox = document.getElementById('history-list-box');
+
+        if (!userUid) {
+            alert("  !   ");
+            window.location.href = "index.html";
+            return;
+        }
+
+        try {
+            //            , 
+            //          
+            const response = await fetch(`${API_URL}/api/wallet/transactions-history`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: userUid })
+            });
+
+            const result = await response.json();
+
+            //            
+            if (response.ok && result.success && result.transactions.length > 0) {
+                listBox.innerHTML = ""; //     
+                
+                result.transactions.forEach(tx => {
+                    let iconClass = "icon-game";
+                    let txIcon = "";
+                    let amtClass = "amt-dedit";
+                    let amtSign = "-";
+                    let statusClass = "status-success";
+
+                    //          
+                    if (tx.type === "add_money" || tx.type === "referral_bonus") {
+                        iconClass = "icon-deposit";
+                        txIcon = "";
+                        amtClass = "amt-credit";
+                        amtSign = "+";
+                    } else if (tx.type === "withdrawal") {
+                        iconClass = "icon-withdraw";
+                        txIcon = "";
+                    }
+
+                    if (tx.status.toLowerCase() === "pending") {
+                        statusClass = "status-pending";
+                    }
+
+                    //      
+                    let txDate = new Date(tx.created_at).toLocaleString('en-IN', {
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    //   (Row)     
+                    const rowHtml = `
+                        <div class="history-row">
+                            <div class="row-left">
+                                <div class="type-icon ${iconClass}">${txIcon}</div>
+                                <div>
+                                    <div class="tx-title">${tx.remark || "Wallet Transaction"}</div>
+                                    <div class="tx-date">${txDate}</div>
+                                </div>
+                            </div>
+                            <div class="row-right">
+                                <div class="tx-amount ${amtClass}">${amtSign} ${parseFloat(tx.amount).toFixed(2)}</div>
+                                <div class="tx-status ${statusClass}">${tx.status}</div>
+                            </div>
+                        </div>
+                    `;
+                    listBox.innerHTML += rowHtml;
+                });
+            }
+        } catch (err) {
+            //        ,       
+            console.log(" Server history fetch offline. Displaying local cache mockup.");
+        }
+    }
+</script>
+
+</body>
+</html>

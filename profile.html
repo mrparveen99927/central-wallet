@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Central Wallet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 16px; padding-bottom: 40px; }
+        
+        /*     */
+        .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        /*       */
+        .profile-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .user-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .user-info p { font-size: 14px; color: #9d4edd; font-weight: 600; letter-spacing: 0.5px; }
+        .edit-btn { background: #1c1c1c; border: 1px solid #334155; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        
+        /*      */
+        .qr-section { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 24px 16px; text-align: center; margin-bottom: 24px; }
+        .qr-title { font-size: 14px; color: #aaa; margin-bottom: 15px; font-weight: 600; }
+        .qr-box { width: 180px; height: 180px; background: #ffffff; margin: 0 auto; border-radius: 12px; padding: 10px; display: flex; justify-content: center; align-items: center; }
+        .qr-box img { width: 100%; height: 100%; }
+        
+        /*     */
+        .setting-list { background: #121212; border: 1px solid #1c1c1c; border-radius: 16px; padding: 6px; margin-bottom: 24px; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1c1c1c; }
+        .setting-item:last-child { border-bottom: none; }
+        .item-left { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; }
+        .incoming-text { font-size: 12px; color: #666; font-weight: bold; }
+        
+        /*    (Toggle Switch) */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #9d4edd; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        /*    */
+        .logout-btn { width: 100%; padding: 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!--     -->
+    <div class="top-nav">
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'"></span>
+        <div class="page-title">Profile Settings</div>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <!--     -->
+    <div class="profile-card">
+        <div class="user-info">
+            <h2 id="prof-name">Loading...</h2>
+            <p id="prof-uid">UID: ------</p>
+        </div>
+        <button class="edit-btn" onclick="alert(' Profile editing features are coming soon via advanced form!')">Edit</button>
+    </div>
+
+    <!--      -->
+    <div class="qr-section">
+        <div class="qr-title"> Your Personal Payment QR</div>
+        <div class="qr-box">
+            <!--          -->
+            <img id="user-qr-img" src="" alt="My QR Code">
+        </div>
+    </div>
+
+    <!--     -->
+    <div class="setting-list">
+        <!--    /  -->
+        <div class="setting-item">
+            <div class="item-left"><span></span><span>Shake to Scan Camera</span></div>
+            <label class="switch">
+                <input type="checkbox" id="shake-toggle" onchange="toggleShakeToScan()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <!--  (  ) -->
+        <div class="setting-item">
+            <div class="item-left"><span></span><span style="color:#666">Performance Boost</span></div>
+            <span class="incoming-text">COMING SOON</span>
+        </div>
+        <!--  ( ) -->
+        <div class="setting-item" onclick="alert(' Security password change tab will be linked with app.py encryption route!')" style="cursor: pointer;">
+            <div class="item-left"><span></span><span>Security & Password</span></div>
+            <span style="color:#555; font-weight:bold;"></span>
+        </div>
+    </div>
+
+    <!--    -->
+    <button class="logout-btn" onclick="handleLogout()">Logout Account</button>
+
+<!--   2   -->
+</body>
+</html>
+<script>
+    //            
+    document.addEventListener("DOMContentLoaded", function() {
+        const uName = localStorage.getItem('user_name') || "User Name";
+        const uUid = localStorage.getItem('user_uid') || "CW00000";
+        const shakeSetting = localStorage.getItem('shake_to_scan') === 'true';
+
+        //     UID 
+        document.getElementById('prof-name').innerText = uName;
+        document.getElementById('prof-uid').innerText = `UID: ${uUid}`;
+
+        //        
+        document.getElementById('shake-toggle').checked = shakeSetting;
+
+        //    UID       (Google API )
+        //         
+        const qrImgElement = document.getElementById('user-qr-img');
+        const qrData = `centralwallet://pay?uid=${uUid}&name=${encodeURIComponent(uName)}`;
+        qrImgElement.src = `https://qrserver.com{encodeURIComponent(qrData)}`;
+    });
+
+    //     /  
+    function toggleShakeToScan() {
+        const isChecked = document.getElementById('shake-toggle').checked;
+        localStorage.setItem('shake_to_scan', isChecked);
+        if(isChecked) {
+            alert(" Shake to Scan   !         ");
+        } else {
+            alert(" Shake to Scan     ");
+        }
+    }
+
+    //   -     
+    function handleLogout() {
+        const confirmClear = confirm("             ?");
+        if (confirmClear) {
+            //        
+            localStorage.clear();
+            alert("        ");
+            //     
+            window.location.href = "index.html";
+        }
+    }
+</script>

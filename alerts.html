@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Center - Central Wallet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 20px; padding-bottom: 90px; min-height: 100vh; }
+        
+        /*     */
+        .top-nav { display: flex; align-items: center; margin-bottom: 24px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; margin-right: 15px; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        /*     */
+        .alerts-container { display: flex; flex-direction: column; gap: 12px; }
+        .alert-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 14px; padding: 16px; border-left: 4px solid #9d4edd; }
+        .alert-card.success-alert { border-left-color: #10b981; }
+        .alert-card.system-alert { border-left-color: #ef4444; }
+        
+        .alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .alert-title { font-size: 14px; font-weight: 700; }
+        .alert-time { font-size: 11px; color: #555; }
+        .alert-body { font-size: 13px; color: #b3b3b3; line-height: 1.4; }
+
+        /*      (5  - Alert Active) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: #0a0a0a; border-top: 1px solid #1c1c1c; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #888; font-size: 11px; font-weight: 600; cursor: pointer; width: 20%; }
+        .nav-btn.active { color: #9d4edd; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+    <!--     -->
+    <div class="top-nav">
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'"></span>
+        <div class="page-title">Notifications Hub</div>
+    </div>
+
+    <!--      -->
+    <div class="alerts-container" id="alerts-list-box">
+        <!--      (   2  - ) -->
+        <div class="alert-card success-alert">
+            <div class="alert-header">
+                <div class="alert-title" style="color: #10b981;"> Withdrawal Successful</div>
+                <div class="alert-time">Just Now</div>
+            </div>
+            <div class="alert-body"> 1,000                     </div>
+        </div>
+
+        <div class="alert-card">
+            <div class="alert-header">
+                <div class="alert-title" style="color: #9d4edd;"> Referral Reward Credited</div>
+                <div class="alert-time">2 Hours Ago</div>
+            </div>
+            <div class="alert-body"> !            5.00       </div>
+        </div>
+
+        <div class="alert-card system-alert">
+            <div class="alert-header">
+                <div class="alert-title" style="color: #ef4444;"> System Maintenance</div>
+                <div class="alert-time">Yesterday</div>
+            </div>
+            <div class="alert-body"> :        12:00   01:00          </div>
+        </div>
+    </div>
+
+    <!--      (5  - Alert Active) -->
+    <div class="bottom-nav">
+        <button class="nav-btn" onclick="window.location.href='dashboard.html'">
+            <span class="nav-icon"></span><span>Home</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='search_feature.html'">
+            <span class="nav-icon"></span><span>Search</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='scan_pay.html'">
+            <span class="nav-icon"></span><span>Scan</span>
+        </button>
+        <button class="nav-btn active" onclick="window.location.href='alerts.html'">
+            <span class="nav-icon"></span><span>Alert</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='history.html'">
+            <span class="nav-icon"></span><span>History</span>
+        </button>
+    </div>
+
+<!--   2   -->
+</body>
+</html>
+<script>
+    //     
+    const API_URL = "https://central-wallet-1.onrender.com";
+
+    //        
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchUserAlertNotifications();
+    });
+
+    //       
+    async function fetchUserAlertNotifications() {
+        const userUid = localStorage.getItem('user_uid');
+        const alertsBox = document.getElementById('alerts-list-box');
+
+        if (!userUid) {
+            alert("  !   ");
+            window.location.href = "index.html";
+            return;
+        }
+
+        try {
+            //      
+            const response = await fetch(`${API_URL}/api/wallet/user-alerts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: userUid })
+            });
+
+            const result = await response.json();
+
+            //       
+            if (response.ok && result.success && result.alerts.length > 0) {
+                alertsBox.innerHTML = ""; //    
+
+                result.alerts.forEach(alertItem => {
+                    let cardClass = "";
+                    let titleColor = "#9d4edd";
+
+                    //         
+                    if (alertItem.type === "success") {
+                        cardClass = "success-alert";
+                        titleColor = "#10b981";
+                    } else if (alertItem.type === "system") {
+                        cardClass = "system-alert";
+                        titleColor = "#ef4444";
+                    }
+
+                    //      
+                    let alertTime = new Date(alertItem.created_at).toLocaleString('en-IN', {
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    const cardHtml = `
+                        <div class="alert-card ${cardClass}">
+                            <div class="alert-header">
+                                <div class="alert-title" style="color: ${titleColor};">${alertItem.title}</div>
+                                <div class="alert-time">${alertTime}</div>
+                            </div>
+                            <div class="alert-body">${alertItem.message}</div>
+                        </div>
+                    `;
+                    alertsBox.innerHTML += cardHtml;
+                });
+            }
+        } catch (err) {
+            //           
+            console.log(" Notification server offline. Displaying template cache.");
+        }
+    }
+</script>

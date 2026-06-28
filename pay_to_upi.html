@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay via Game UPI - Central Wallet</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000000; color: #ffffff; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /*     */
+        .top-nav { display: flex; align-items: center; margin-bottom: 30px; }
+        .back-arrow { font-size: 24px; color: #ffffff; text-decoration: none; cursor: pointer; margin-right: 15px; }
+        .page-title { font-size: 18px; font-weight: 700; color: #9d4edd; text-transform: uppercase; }
+        
+        .upi-card { background: #121212; border: 1px solid #1c1c1c; border-radius: 20px; padding: 20px; text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 6px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 14px; background: #000000; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: #9d4edd; }
+        
+        .verify-btn { width: 100%; padding: 14px; background: #9d4edd; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
+        /*     (MPIN Area) */
+        .payment-box { display: none; margin-top: 24px; background: #1a1a1a; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: left; }
+        .payment-title { font-size: 12px; color: #10b981; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+        .amount-text { font-size: 28px; font-weight: 800; color: #10b981; margin-bottom: 15px; }
+        .pay-btn { width: 100%; padding: 14px; background: #10b981; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <!--        -->
+    <div class="top-nav">
+        <span class="back-arrow" onclick="window.location.href='dashboard.html'"></span>
+        <div class="page-title">Pay to Game UPI</div>
+    </div>
+
+    <div class="upi-card">
+        <!--      -->
+        <div class="input-group">
+            <label>Paste Game UPI ID</label>
+            <input type="text" id="game-upi-input" placeholder="e.g. pay-game-123456@cw">
+        </div>
+        <button class="verify-btn" onclick="verifyGameUpi()">Verify & Fetch Amount</button>
+
+        <!--     MPIN       -->
+        <div id="payment-area" class="payment-box">
+            <div class="payment-title">Requested Amount</div>
+            <div id="display-amount" class="amount-text"> 0.00</div>
+            
+            <div class="input-group">
+                <label>Confirm 4-Digit MPIN</label>
+                <input type="password" id="transfer-mpin" maxlength="4" placeholder="" style="text-align: center; letter-spacing: 5px; font-size: 20px;">
+            </div>
+            
+            <button class="pay-btn" onclick="executeUpiPayment()">Confirm & Pay Now</button>
+        </div>
+    </div>
+
+<!--   2   -->
+<script>
+    //      
+    const API_URL = "https://central-wallet-1.onrender.com";
+
+    //  1.     
+    async function verifyGameUpi() {
+        const gameUpi = document.getElementById('game-upi-input').value.trim();
+        const paymentArea = document.getElementById('payment-area');
+        const amountDisplay = document.getElementById('display-amount');
+
+        if (!gameUpi) {
+            alert("        !");
+            return;
+        }
+
+        try {
+            //       
+            //    -         
+            // (    'game_sync_requests'      )
+            const response = await fetch(`${API_URL}/api/wallet/pay-to-upi`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    sender_uid: localStorage.getItem('user_uid') || "",
+                    game_upi_id: gameUpi,
+                    mpin: "0000" //         ,     
+                })
+            });
+
+            const result = await response.json();
+
+            //        ""  
+            if (result.message.includes("") || result.message.includes("")) {
+                alert(` ${result.message}`);
+                paymentArea.style.display = 'none';
+            } else {
+                //          (       ) 
+                //             
+                // :   pay-to-upi     ,     
+                //             
+                
+                //         ,        
+                paymentArea.style.display = 'block';
+                //     500.00      
+                amountDisplay.innerText = "Verified & Ready";
+            }
+        } catch (err) {
+            //                
+            paymentArea.style.display = 'block';
+            amountDisplay.innerText = "Fetch Live Amount";
+            console.error(err);
+        }
+    }
+
+    //  2.    
+    async function executeUpiPayment() {
+        const gameUpi = document.getElementById('game-upi-input').value.trim();
+        const mpin = document.getElementById('transfer-mpin').value.trim();
+        const senderUid = localStorage.getItem('user_uid');
+
+        if (!senderUid) {
+            alert("  !   ");
+            window.location.href = "index.html";
+            return;
+        }
+        if (mpin.length !== 4 || isNaN(mpin)) {
+            alert("  4    MPIN  !");
+            return;
+        }
+
+        try {
+            //      
+            const response = await fetch(`${API_URL}/api/wallet/pay-to-upi`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sender_uid: senderUid,
+                    game_upi_id: gameUpi,
+                    mpin: mpin
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok || result.success) {
+                alert(`  !\n\n             `);
+                window.location.href = "dashboard.html";
+            } else {
+                alert(`  : ${result.message}`);
+            }
+        } catch (err) {
+            alert("   !    ");
+            console.error(err);
+        }
+    }
+</script>
+
+</body>
+</html>
